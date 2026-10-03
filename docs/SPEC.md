@@ -9,9 +9,10 @@ one-line game plan.
 ## Users
 - Whoever installed it. Players get filled, so **all five roles must produce a good report**, not
   just jungle. `ROLES.md` is the per-role spec.
-- Runs on the player's Windows PC next to the League client, as the Sidekick app. Personal use: a
-  friend can install it from the public repo (README), and each League account keeps its own
-  champion list.
+- Runs on the player's Windows PC next to the League client, as the Sidekick app, installed
+  with `SidekickSetup.exe` from the repo's releases (README; no commands). Personal use shared
+  with friends: each person's settings, keys and champion lists (one per League account) stay
+  on their own PC.
 
 ## When it runs
 | Moment | What it does | Milestone |

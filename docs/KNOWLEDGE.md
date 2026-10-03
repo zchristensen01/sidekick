@@ -17,7 +17,7 @@ judgment that the owner owns and reviews. The writer only sees what's in its inp
 | 2. Champion brief | "Shen R shields an ally anywhere on the map and teleports him there after a delay. After his 6, check where he is before fighting in any lane." | `data/manual/champion_traits.csv` (text columns) | drafted from layer 1 by an LLM, reviewed by the owner | review queue when abilities change |
 | 3. Matchup brief | Darius vs Teemo, top: who's stronger at 1-3, 3-6, after 6, after first item; how to trade; what to ask the jungler | `data/manual/matchup_briefs.csv` | drafted from layers 1, 2 and 4 in a Claude Code session, reviewed by the owner | `brief_stale` in the review queue when either champion's kit changes or OP.GG's lane advantage flips |
 | 4. Matchup data | 47% over 4,140 games; "lane advantage: Elise"; the enemy's usual core build vs you; OP.GG's one-line tip | `data/generated/stats.sqlite` | OP.GG | lane stats daily (`stats.max_age_hours`); matchup tables, labels and builds kept 72 hours (`stats.matchup_max_age_hours`) (`DATA.md`) |
-Plus the owner's own `matchup_notes.csv`, shown verbatim as "Your notes".
+Plus each user's own `matchup_notes.csv` (in their Sidekick folder), shown verbatim as "Your notes".
 
 **Sourced facts beside the layers (M15):** Riot's playstyle ratings and the LoL Wiki's
 mechanic categories per champion (`champion_meta.csv`: `rating_*`, `mechanics`), and game

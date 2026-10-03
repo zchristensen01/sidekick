@@ -53,21 +53,23 @@ Rules of thumb:
 sidekick/                    # repo root (GitHub: zchristensen01/sidekick)
   CLAUDE.md  README.md
   pyproject.toml             # package "scout": commands "scout" and "sidekick" (the app, no console)
-  install.ps1                # one-step install for a friend: .venv, pip, shortcuts, open the app
-  config.example.yaml        # copy to config.yaml (gitignored; the app does it on first start)
-  .env.example               # copy to .env (gitignored): RIOT_API_KEY, ANTHROPIC_API_KEY
-  pool.yaml                  # your champions per lane with 1-5 comfort stars (gitignored, M14)
-  pools/                     # each League account's champions + accounts.yaml (gitignored, M22)
+  config.example.yaml        # the app copies it to your folder as config.yaml on first start
+  .env.example               # likewise .env: RIOT_API_KEY, ANTHROPIC_API_KEY
+  packaging/                 # the installed app (M24): PyInstaller spec, Inno Setup script,
+                             # build.py, pinned library versions (docs/DEVELOPING.md, Releases)
+  .github/workflows/release.yml  # tests, build and publish a release when the app changes
+  tools/dev_setup.ps1        # a developer's .venv with the test tools (players use the installer)
   tools/make_icon.py         # draws scout/app/sidekick.ico and sidekick.png
   research/                  # prompts for facts with no automatic source (written by Sidekick),
                              # results/ (agents' replies; done/ once applied), status.csv
   docs/
   prototype/                 # v0 reference code, never imported
   scout/
-    __main__.py              # `python -m scout` (the app runs `python -m scout refresh` this way)
+    __main__.py              # `python -m scout` (a developer copy's app runs `python -m scout refresh`)
     cli.py                   # typer app: every `scout` command (README, Commands)
     config.py                # config.yaml + .env -> typed Config, validated; in-place value edits
-    paths.py                 # every filesystem location in one place
+    paths.py                 # every filesystem location: the program's files vs your own (M24)
+    version.py               # the installed app's version (build.json); "dev" from source
     pool.py                  # pool.yaml: champions per lane with comfort stars (M14)
     accounts.py              # one pool per League account; suggestions from your games (M22)
     picks.py                 # pick suggestions in champ select (M9b)
@@ -81,9 +83,9 @@ sidekick/                    # repo root (GitHub: zchristensen01/sidekick)
       session.py             # builds the watcher, stats, writer and client (app and scout watch)
       window.py              # the pywebview window and the page's bridge
       dashboard.html         # every screen, Settings, Champions, History, Both teams (HTML/CSS/JS, no internet)
-      update.py              # the Update button: git check/pull, the restart helper
+      update.py              # the Update button: releases (installed) or git (developer copy)
       portraits.py           # champion pictures from Data Dragon, cached
-      shortcut.py            # Desktop and Start-menu shortcuts
+      shortcut.py            # a developer copy's shortcuts (the installer makes the app's)
       sidekick.ico  sidekick.png
     model/
       roles.py               # Role, Lane, Queue enums; LCU position and queue-id mapping
@@ -114,7 +116,7 @@ sidekick/                    # repo root (GitHub: zchristensen01/sidekick)
       events.py              # websocket subscription (WAMP), with polling fallback
       champselect.py         # session JSON -> GameState
       watcher.py             # gameflow state machine for scout watch
-      recorder.py            # scout record: scrubbed session snapshots -> fixtures
+      recorder.py            # scout record: scrubbed session snapshots -> your recordings folder
     analysis/
       insights.py            # runs the analysis: lineup, lanes, ganks, threats, stats -> Insights
       role_inference.py  lanes.py  ganks.py  jungle.py  roam.py  team.py  threats.py  stats.py
@@ -138,18 +140,32 @@ sidekick/                    # repo root (GitHub: zchristensen01/sidekick)
       backtest.py            # every call graded on the stored games; track records (M20)
   data/
     manual/                  # hand-owned, committed. Code never overwrites (append or scout review only)
-    generated/               # machine-owned, gitignored: static data and OP.GG numbers (rebuilt by
-                             # scout refresh); stats.sqlite also holds the collected match data
-                             # (M19), which a refresh can't rebuild
-    cache/                   # raw API responses, champion pictures, gitignored
-    history/                 # machine-owned, gitignored: post-game results (append-only, M10, not
-                             # rebuildable) and backtest.csv (rewritten each refresh, M20)
-  reports/                   # each game's report, claims and History screen, gitignored
   tests/
-    fixtures/champselect/    # recorded LCU sessions (scrubbed)
+    fixtures/champselect/    # made-up sample sessions in the client's real format (hard rule 10)
     fixtures/games/          # hand-written game YAMLs
     fixtures/sources/        # recorded raw responses from each data source
     golden/                  # expected sections and fired rule IDs per game fixture
+
+%LOCALAPPDATA%\Sidekick\     # each Windows user's own files (scout/paths.py); never in git.
+                             # The installed app and a developer copy use the same folder.
+  config.yaml  .env          # settings and keys (Settings writes them)
+  pool.yaml  pools/          # champions per lane with comfort stars; one list per account (M22)
+  matchup_notes.csv          # your own notes, shown as "Your notes"
+  recordings/                # scrubbed champ select recordings (scout record, the app)
+  reports/                   # each game's report, claims and History screen; debug/ logs
+  data/
+    generated/               # machine-owned: static data and OP.GG numbers (rebuilt by scout
+                             # refresh); stats.sqlite also holds the collected match data (M19),
+                             # which a refresh can't rebuild
+    cache/                   # raw API responses, champion pictures, update downloads
+    history/                 # post-game results (append-only, M10) and backtest.csv (M20)
+
+%LOCALAPPDATA%\Programs\Sidekick\   # the installed app (SidekickSetup.exe; updates replace it)
+  Sidekick.exe               # the app window
+  sidekick-helper.exe        # the same `scout` commands with a console, for the hidden refresh
+  unins000.exe
+  _internal/                 # Python and libraries, scout/, data/manual/, docs/REPORT_AGENT.md,
+                             # the example settings, build.json
 ```
 
 ## Core types
@@ -203,8 +219,8 @@ class GameState:
 |---|---|---|
 | Session | always | follows the League client: champ select, loading screen, game end (`lcu/watcher.py`) |
 | Collector | every 30 s, only while idle | measures new Emerald+ games with its own share of the Riot key's rate limit (M19) |
-| Update check | 20 s after start, then every 6 hours, only while idle | `git fetch`; "Update available" in the top bar (M21) |
-| Data refresh | checks every 5 minutes; runs when the last one is 6+ hours old and you're idle | `scout refresh --pool` in a hidden child process (M21); on the research PC it also checks the wiki for hotfixes and rewrites the research prompts |
+| Update check | 20 s after start, then every 6 hours, only while idle | the newest release's latest.json (installed app) or `git fetch` (developer copy); "Update available" in the top bar (M21, M24) |
+| Data refresh | checks every 5 minutes; runs when the last one is 6+ hours old and you're idle | `scout refresh --pool` in a hidden child process (`sidekick-helper.exe` when installed; M21, M24); on the research PC it also checks the wiki for hotfixes and rewrites the research prompts |
 | Research due | worked out each minute | `research/status.csv` against the current patch; shown on the owner's PC (`owner: true`) |
 
 "Idle" means the client isn't in champ select, the loading screen or a game (`Watcher.idle`,
@@ -212,6 +228,9 @@ even for a game Sidekick isn't following), and for the collector and the refresh
 (refresh, update) running.
 
 ## Runtime: Windows
+- Players run the installed app (`SidekickSetup.exe`, built by `packaging/`): its own Python
+  inside, no admin rights, updates from GitHub Releases. A developer copy runs from the repo
+  with `.venv` (`docs/DEVELOPING.md`). Both keep personal files in `%LOCALAPPDATA%\Sidekick`.
 - The app runs on Windows, next to the League client: `scout watch`, `scout record` and
   anything else that talks to the client must run under Windows Python (3.11+).
 - Offline work (tests, `scout report --file`, `scout refresh`) runs anywhere, including WSL.
@@ -237,12 +256,12 @@ variables of the same name.
 Runtime: `typer` (CLI), `httpx` (HTTP; OP.GG's MCP server is spoken over plain HTTP, no MCP
 library), `websockets` (LCU events), `psutil` (find the client process), `pyyaml`,
 `python-dotenv`, `anthropic` (writer), `pywebview` (the app window, Windows only).
-Dev: `pytest`, `ruff`. No pandas: tables are small, and `csv` + dataclasses are easier to read.
+Dev: `pytest`, `ruff`. Build: `pyinstaller`, plus Inno Setup 6 (not a Python package). No pandas: tables are small, and `csv` + dataclasses are easier to read.
 The stats database is SQLite via the standard library (`sqlite3`).
 
 ## Testing strategy
 - No network in tests, ever. Sources are tested against `tests/fixtures/sources/`, the client
-  against recorded sessions in `tests/fixtures/champselect/`.
+  against made-up sample sessions in `tests/fixtures/champselect/` (the client's real format).
 - Rules are tested two ways: small synthetic contexts per rule (fires / doesn't fire), and
   golden full games per role (expected sections and rule IDs).
 - A contradiction test asserts that rules linked by `excludes` never fire together on the game

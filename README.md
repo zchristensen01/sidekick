@@ -1,165 +1,163 @@
 # Sidekick
 
-A personal League of Legends **pre-game scouting report**. When champion select ends, it reads
-the draft from your League client and shows a short report for the role you're playing: how your
-lane goes at each stage, whether you got counter-picked and how to play into it, what both
-junglers mean for you, ults and roamers that can join your fights, enemy combos, who must not get
-fed, and a one-line game plan.
+A pre-game scouting report for League of Legends, for whichever role you're playing. While you
+draft, Sidekick suggests picks from your own champions. At the loading screen it shows one
+short report: how your lane goes at each stage, whether you got counter-picked and how to play
+into it, what both junglers mean for you, ults that can join your fights, enemy combos, who
+must not get fed, and a game plan.
 
-Read-only and pre-game only: it never changes anything in the client and shows nothing during
-the game. Personal use (a friend can install it from this repo; see below). The package and
-command are called `scout`.
+It only **reads** your League client (it never clicks, picks or changes anything) and it shows
+nothing during the game. Windows 10 or 11.
 
-**Status:** the Sidekick app follows your League client by itself: pick options while you
-draft, then one report at the loading screen, as soon as it shows everyone's summoner spells,
-written by Claude Haiku (about 1 cent a game) with the roles, spells, players and likely duos in
-it. Nothing is shown as a report before that. Progress: [`docs/TASKS.md`](docs/TASKS.md);
-everything asked for and where it stands: [`docs/REQUESTS.md`](docs/REQUESTS.md).
+## 1. Download and install (about 2 minutes, no commands)
 
-## Using it
-Open **Sidekick** from the Desktop or the Start menu and leave it open while you play (a second
-monitor works well; it remembers where you put it). It waits for the League client and a game
-on its own. ARAM and other modes are skipped. Reports are saved to `reports/`.
+1. **Download [SidekickSetup.exe](https://github.com/zchristensen01/sidekick/releases/latest/download/SidekickSetup.exe)**
+   (about 40 MB). That link is always the newest version.
+2. Your browser may say the file **isn't commonly downloaded**. Choose **Keep**. In Edge: click
+   the **...** next to the download, then **Keep**, then **Show more**, then **Keep anyway**.
+3. Open the downloaded file. Windows may show a blue box, **"Windows protected your PC"**.
+   Click **More info**, then **Run anyway**. You only see this the first time.
 
-**History** (top right) lists your past games on this PC, newest first: when, which of your
-accounts, the matchup, and how many of the report's calls came true after the game. Open one to
-see its whole dashboard again (Both teams too), with the post-game results under it. It's kept
-in `reports/` on your PC only, never sent to GitHub.
+   Why the warnings: Sidekick is a small free project without a paid code-signing certificate,
+   so Windows doesn't know it yet. Every release's fingerprint (SHA-256) is listed on its
+   [release page](https://github.com/zchristensen01/sidekick/releases) if you want to check.
+4. Click **Install**. No administrator password is needed. Untick **Put Sidekick on the
+   Desktop** if you don't want a Desktop shortcut.
+5. Leave **Open Sidekick now** ticked and click **Finish**.
 
-**Champions** (top right) is your list: the champions you play in each lane with 1-5 comfort
-stars, saved as you change it. Pick suggestions use it. Each League account keeps its own list
-(in `pools/`), and the page follows whoever is logged in to the client. It suggests champions
-from your own games: ones you played 4+ times in a lane recently (Add or No), and "Suggest from
-my most-played" (your champion mastery).
+Sidekick is now in your Start menu (and on your Desktop). If Windows blocks it with no
+**Run anyway** button, see [Troubleshooting](#troubleshooting).
 
-Everything else is in **Settings** (top right):
-- **Account and Riot key**: who is logged in and your region, both read from the League
-  client (nothing to type); paste a Riot API key (tested before it's saved); and "Players at
-  the loading screen", each visible player's OP.GG record on their champion (rank, games, win
-  rate, average K/D/A; never names), on or off (`docs/POLICY.md`).
-- **AI report writer**: on or off, today's cost, and the Anthropic key.
-- **Data and updates**: refresh the data, **Check for updates** (gets the newest version from
-  GitHub, restarts, refreshes the data), shortcuts, and the reports and log folders; on the
-  owner's PC also the match data collector and research (`docs/MATCH_DATA.md`).
+## 2. First start
 
-**It keeps itself current** while it's open: it checks GitHub for a new version at start and
-every 6 hours ("Update available" in the top bar), refreshes its data every 6 hours (a new
-patch, OP.GG's numbers) when you're not in a game, and measures Riot's match data in the
-background. What updates when, and every source: [`docs/PATCH_UPDATE.md`](docs/PATCH_UPDATE.md).
+- Sidekick downloads the champion data first (about a minute, "Getting ready").
+- Then it says **Waiting for the League client**. Open League as you normally do. Sidekick
+  follows the client by itself; there's nothing to log in to.
+- **Leave Sidekick open while you play.** A second monitor works well; it remembers where you
+  put it.
+- What you'll see in a game:
+  - **While you draft:** pick options for your role, from your own champions (step 3).
+  - **When picks lock:** "Picks locked. The report comes at the loading screen."
+  - **At the loading screen:** your report. Nothing during the game.
+  - ARAM and other modes are skipped.
 
-`scout watch` in a terminal opens the same app and also prints what it's doing. If something
-goes wrong, `reports/debug/app.log` says what.
+## 3. Set up your champions (do this first, 2 minutes)
 
-## Install (Windows)
-Needs Windows, the League client, Python 3.11 or newer and Git (for updates). The command line
-is needed once, for these steps; after that it's only the Sidekick app.
+Pick options come from your list, so set it up before your first game.
 
-1. Open **PowerShell** (Start menu, type PowerShell) and install Python and Git (skip either if
-   it's already installed):
-   ```powershell
-   winget install -e --id Python.Python.3.13
-   winget install -e --id Git.Git
-   ```
-   (Or from the websites: [Python](https://www.python.org/downloads/), ticking "Add python.exe
-   to PATH", and [Git](https://git-scm.com/download/win).)
-2. **Close PowerShell and open a new one** (so it sees Python and Git), then:
-   ```powershell
-   git clone https://github.com/zchristensen01/sidekick.git $HOME\Sidekick
-   cd $HOME\Sidekick
-   powershell -ExecutionPolicy Bypass -File install.ps1
-   ```
-   That makes a private Python environment (`.venv`), installs Sidekick, adds the Desktop and
-   Start-menu shortcuts and opens it. On first start it makes its settings files
-   (`config.yaml`, `.env`, `pool.yaml`, all private) and downloads the champion data (about a
-   minute).
-3. From then on, open **Sidekick** from the Desktop or Start menu. Updates come from the app's
-   "Update available" button; run `install.ps1` again only if an update says so.
+1. Open the League client and log in. Sidekick reads which account is logged in; each account
+   has its own list.
+2. In Sidekick, click **Champions** (top right).
+3. In each lane you play, click **Add a champion...**, type a name and pick it from the list.
+4. Give each champion **stars**: 1 = still learning, 5 = your main. Keep them honest: pick
+   options rank your champions by them (a more comfortable champion comes first unless
+   another is clearly better in that draft).
+5. To remove one, click its **×**. Changes save by themselves.
 
-For development (tests, lint), also: `.venv\Scripts\python -m pip install -e ".[dev]"`, then
-`.venv\Scripts\Activate.ps1`, `scout doctor`, `pytest`.
+Help filling it in:
+- **Suggestions from your games**: champions you've played 4 or more times in a lane recently
+  show up with **Add** or **No**.
+- **Suggest from my most-played**: your highest-mastery champions, each with its usual lane.
+- Several accounts: log in to each one once and set up its list.
 
-Keys (both optional; paste them in Settings):
-- `ANTHROPIC_API_KEY`: the written report at the loading screen calls Claude through the
-  Anthropic API (console.anthropic.com, pay as you go, about 1 cent a game, capped per day).
-  Without it, or with the AI writer off, the report is the rules version (same facts, as a
-  list).
-- `RIOT_API_KEY`: a free personal key from Riot. It lets the app measure Riot's match data in
-  the background (gold at 10, lane push, level timings, jungle clears, per champion and role),
-  check each report against your game afterwards (post-game), and spot enemy one-tricks at the
-  loading screen. Without it, everything else works: pick options, OP.GG's numbers, the
-  report.
+## 4. Add your keys (optional)
 
-### Getting a Riot API key
-1. Go to https://developer.riotgames.com and log in with your Riot account.
-2. Click **Register Product**, choose **Personal API Key**.
-3. Describe it, e.g. "Sidekick: a personal pre-game scouting report. Reads my own League client
-   (read-only). Uses League-EXP-V4 and Match-V5 to measure aggregate champion statistics from
-   ranked games in the background (no player data stored), Match-V5 and Champion-Mastery-V4 at
-   the loading screen, and Match-V5 for my own games afterwards. Not distributed."
-   (`docs/POLICY.md` has the details if they ask.)
-4. When it's approved, paste it in Settings, Account and Riot key (or run `scout key`). Until
-   then, the development key on your dashboard works for 24 hours at a time: when Settings
-   shows it as rejected, click "Regenerate API Key" on the dashboard and paste the new one. One
-   key covers all your accounts.
+Sidekick works without any keys: you get the free report (the same facts, as a list). Keys add:
 
-There's no Riot login: the app reads the League client that's already logged in on your PC.
-
-## Commands
-| Command | What it does | Built in |
+| Key | What it adds | Cost |
 |---|---|---|
-| `scout doctor` | Checks Python, config, keys (the Riot key with a live call; the Anthropic key's presence), data files, briefs, the client | M0 |
-| `scout record [--all-queues]` | Saves scrubbed champ select sessions as test fixtures (`--all-queues`: ARAM and customs too) | M1 |
-| `scout refresh [--static] [--stats] [--pool] [--force] [--prune]` | Updates static data (a new patch), OP.GG's stats when older than a day, and the review queue; `--static` or `--stats` does only that part (`--stats` refreshes the stats even if fresh); `--pool` also fetches matchup tables for everyone's champions (the app runs it every 6 hours); `--force` rebuilds static data anyway; `--prune` deletes old versions' files. Then reruns the backtest | M2, M8 |
-| `scout review [champ]` | Walks unreviewed champion traits: accept, edit, or skip | M3 |
-| `scout key` | Paste a new Riot API key into `.env` (tested first; never shown) | M11 |
-| `sidekick` | The app (no console): what the Desktop shortcut opens | M14 |
-| `scout pool [--show]` | Your champions per role in `pool.yaml`, with your most-played champions from the client as suggestions. The app's Champions page keeps one list per account instead (`pools/`; a new account starts from pool.yaml) | M9b, M14, M22 |
-| `scout shortcut` | Puts Sidekick on the Desktop and in the Start menu | M14 |
-| `scout research` | Rewrites the research prompts in `research/` with the current champion list and game facts (after a new patch) | M15 |
-| `scout import-research [--yes]` | Reads agents' replies in `research/results/`, shows what would change, applies on OK (the app has a button for it) | M19 |
-| `scout collect [--games N] [--status]` | Measures Emerald+ ranked games from Riot's match data (the app does it in the background); `--status` shows coverage and the OP.GG cross-check | M19 |
-| `scout draft-traits [<champ>] [--all-missing]` | Drafts a traits row for you to check (`--all-missing`: every champion without a row) | M3 |
-| `scout report --file <game.yaml> [--role r] [--debug] [--write] [--fetch]` | Offline report for a saved or hand-written game (`--debug` shows each line's source; `--write` also has the LLM write it, about 1 cent; `--fetch` gets missing OP.GG stats first, free) | M5, M7, M8 |
-| `scout demo [--role r] [--file <game.yaml>]` | Opens the app window and plays a saved game through its screens, so you can see it without the League client | M13 |
-| `scout watch [--no-record] [--no-window] [--no-llm] [--no-stats]` | Opens the Sidekick app and also prints to the terminal (`--no-window`: terminal only). Waits for the client and a game, shows pick options for your role until you lock, then one report at the loading screen (written by the AI if it's on) | M6, M7, M8, M13, M14 |
-| `scout postgame [--file reports/<report>.json] [--note/--no-note]` | Checks a report's predictions against what happened (the app does it after each game; default: the newest unchecked report), then offers to add a matchup note; results in `data/history/` | M10 |
-| `scout backtest [--games N] [--fetch]` | Grades every read on the games the collector stored, against always guessing the usual outcome; results in `data/history/backtest.csv`. `--fetch` first gets OP.GG's matchup tables the games need (otherwise no network); `scout refresh` reruns it | M20 |
+| **Anthropic API key** | The report at the loading screen, written in plain sentences by Claude (an AI) from the same facts | Pay as you go: about 1 cent a game, at most 40 a day |
+| **Riot API key** | Enemy players who queue together and one-tricks at the loading screen, and a check of each report against what happened after the game | Free |
 
-## Developing
-- `pytest` (offline, always) and `ruff check .` before every commit.
-- Start with [`CLAUDE.md`](CLAUDE.md); it indexes every doc in [`docs/`](docs/).
-- Commands that talk to the League client (`watch`, `record`) need Windows Python. Offline work
-  runs anywhere, including WSL.
+Both are tested when you paste them, and they're stored only on your PC.
 
-## Running it on a friend's PC
-The repo is public, so a friend doesn't need to be a collaborator. They follow the Install steps
-above once (two `winget` lines, then three lines to clone and install), and from then on only
-use the app: it updates itself from GitHub ("Update available", one click), refreshes its own
-data, and everything they set is in the app (Champions; Settings for keys and the AI writer).
-Being a collaborator only matters for pushing changes; if the repo is ever made private, add
-them as a collaborator first, or their copy stops updating.
+### Anthropic key (the AI-written report)
+1. Go to [console.anthropic.com](https://console.anthropic.com) and make an account.
+2. Under **Billing**, add a little credit (for example $5, which lasts hundreds of games).
+3. Under **API Keys**, click **Create Key** and copy it (it starts with `sk-ant-`). It's shown
+   only once, so keep a copy somewhere safe, such as a password manager.
+4. In Sidekick: **Settings** → **AI report writer** → paste it under **Anthropic API key** →
+   **Test and save**. It should say **Saved and working**.
 
-What they get, and what's shared:
-- Their own settings, keys and champion lists (`.env`, `config.yaml`, `pool.yaml`, `pools/`,
-  `reports/`, `data/generated/`, `data/history/` stay out of git), so they start clean.
-- Everything in `data/manual/` (game facts, class definitions, champion notes, matchup briefs)
-  and the research results come with each update. Research is the owner's job: their app has
-  `owner: false` (the default), so research and match data collection stay hidden for them
-  (`docs/MATCH_DATA.md`).
-- Without keys: pick options, OP.GG's numbers and the report's rules version. With
-  their own Riot key: measured match data on their PC, the post-game check, one-tricks. With
-  their own Anthropic key: the written report (about 1 cent a game).
-- If an update ever stops with "changes files you've edited here", they ask the owner; it only
-  happens if they applied research results themselves.
+The switch at the top of that page turns the AI writer on or off, and **Today** shows how many
+reports it wrote and what they cost.
 
-## Refresh while the app is closed (optional)
-The app refreshes its data every 6 hours while it's open, so this is only for a PC that's on
-without the app open. In PowerShell, once:
-```powershell
-schtasks /Create /SC DAILY /ST 05:00 /TN "Sidekick refresh" /TR "$HOME\Sidekick\.venv\Scripts\scout.exe refresh --pool"
-```
-(`$HOME\Sidekick` is where the install steps put it; use your own Sidekick folder if it's
-elsewhere.)
-It runs at 5 AM if the PC is on (OP.GG is free; no API cost). Check it with
-`schtasks /Query /TN "Sidekick refresh"`, remove it with `schtasks /Delete /TN "Sidekick refresh"`.
-Results go to `data/generated/REFRESH_LOG.md`.
+### Riot key (duos, one-tricks, after-game check)
+1. Go to [developer.riotgames.com](https://developer.riotgames.com) and log in with your Riot
+   account.
+2. On your dashboard, copy the **Development API Key** (it starts with `RGAPI-`).
+3. In Sidekick: **Settings** → **Account and Riot key** → paste it under **Riot API key** →
+   **Test and save**.
+
+A development key **expires every 24 hours**. When Settings shows it as **Rejected: expired or
+wrong**, click **Regenerate API Key** on your Riot dashboard and paste the new one. To stop
+renewing it: on the Riot site click **Register Product**, choose **Personal API Key**, and
+describe it, for example: *"Sidekick: a personal pre-game scouting report. Reads my own League
+client (read-only); uses Match-V5 and Champion-Mastery-V4 at the loading screen and for my own
+games afterwards."* Once it's approved, paste that key instead. One key covers all your
+accounts.
+
+On the same Settings page, **Players at the loading screen** shows each visible player's OP.GG
+record on their champion (rank, games, win rate, average kills/deaths/assists; never names).
+Turn it off if you'd rather not see it.
+
+## Updates
+
+Sidekick checks for a new version when it opens and every 6 hours. When there is one,
+**Update available** appears at the top: click it, then **Update and restart** (not during a
+game). It downloads the new version, checks it's the real file, installs it and reopens in
+about half a minute. Your champions, keys and settings stay as they are. The champion data
+and win rates also refresh by themselves every 6 hours.
+
+## Your files and privacy
+
+- Everything that's yours (settings, keys, champion lists, reports and downloaded data) is in
+  your own Sidekick folder on this PC, `%LOCALAPPDATA%\Sidekick`. **Settings** → **Data and
+  updates** → **Open my Sidekick folder** opens it.
+- Nothing is sent to GitHub or shared with anyone. Your keys are only used to talk to Riot and
+  Anthropic.
+- **History** (top right) lists your past games on this PC, with each game's report.
+- The program itself is in `%LOCALAPPDATA%\Programs\Sidekick`.
+
+## Uninstall
+
+Windows **Settings** → **Apps** → **Installed apps** → **Sidekick** → **Uninstall**. It asks
+whether to also delete your settings and data. The default, **No**, keeps them for a later
+install.
+
+## Moving from the old version
+
+If you installed Sidekick before with `git clone` and `install.ps1`:
+
+1. Close the old Sidekick.
+2. Want to keep your keys? Open the old Sidekick folder (where you cloned it, for example
+   `C:\Users\<you>\Sidekick`), open `.env` with Notepad and copy the keys somewhere safe.
+   Or get new ones later (step 4).
+3. Install the new version (step 1). Its Start menu and Desktop shortcuts replace the old ones.
+4. Delete the old Sidekick folder in File Explorer. It had its own copy of Python; nothing
+   else uses it.
+5. If you installed Python and Git only for Sidekick, you can uninstall them too (Windows
+   **Settings** → **Apps**).
+6. In the new Sidekick, set up your champions (step 3) and paste your keys (step 4).
+
+## Troubleshooting
+
+- **"Windows protected your PC":** click **More info**, then **Run anyway**.
+- **Blocked by Smart App Control** (Windows 11, no Run anyway button): Smart App Control blocks
+  every app without a code-signing certificate. You can turn it off in **Windows Security** →
+  **App & browser control** → **Smart App Control settings**. On some versions of Windows it
+  can't be turned back on without resetting Windows, so decide for yourself.
+- **Your antivirus flags it:** apps packaged this way sometimes trip antivirus programs by
+  mistake. You can compare the file's SHA-256 with the one on the release page, then allow it.
+- **The window stays blank:** install Microsoft's
+  [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) (the installer
+  normally does this), then open Sidekick again.
+- **"Sidekick is already open":** it's in the taskbar, maybe on another monitor.
+- **Something else:** **Settings** → **Data and updates** → **Open the log folder**. The file
+  `app.log` says what happened.
+
+## For developers
+
+Sidekick is Python. Setup, the `scout` commands, tests and how releases are built:
+[`docs/DEVELOPING.md`](docs/DEVELOPING.md). Every design document is indexed in
+[`CLAUDE.md`](CLAUDE.md); progress is in [`docs/TASKS.md`](docs/TASKS.md).

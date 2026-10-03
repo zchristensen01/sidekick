@@ -78,7 +78,9 @@ ones were being auto-approved in 2025-2026. In the product description, list the
 endpoints we use (`LCU.md` section 2) and the Riot API endpoints. Limits: 20 requests per second
 and 100 per 2 minutes, per region.
 
-## If this ever goes beyond personal use
-Sharing with friends would mean: a production key or staying within "small private community",
-each user's own Anthropic key or a local model, Windows packaging, and trait data that doesn't
-depend on the owner reviewing everything. Out of scope for v1 (`SPEC.md`).
+## Sharing with friends (M24)
+Sidekick is installed from public GitHub Releases (`SidekickSetup.exe`). Each person uses their
+own keys (their own Riot key within "a small private community", their own Anthropic key or
+none) and keeps their own data on their PC; nothing of anyone's is in the repo (CLAUDE.md hard
+rule 10). Wider use would mean a production key and trait data that doesn't depend on the
+owner reviewing everything.

@@ -164,8 +164,8 @@ Traits describe a kit, which changes rarely. A row is flagged for review when:
 Code never changes the CSV on its own. It only queues the row and proposes the change.
 
 ## Other hand-owned files
-**`data/manual/matchup_notes.csv`**: `role, champ_id, opp_champ_id, note, date`. The owner's own
-experience, shown verbatim as "Your notes". `scout postgame` offers to append one after it
+**`matchup_notes.csv`** (each user's own, in their Sidekick folder, never in git):
+`role, champ_id, opp_champ_id, note, date`. Their own experience, shown verbatim as "Your notes". `scout postgame` offers to append one after it
 checks a game. The app's automatic post-game check doesn't offer one, and it marks the report
 checked, so a plain `scout postgame` skips that game afterwards.
 

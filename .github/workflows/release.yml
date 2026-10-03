@@ -1,0 +1,70 @@
+# Builds and publishes a Sidekick installer when the app changes on main (M24, DECISIONS #115).
+# Tests and lint must pass first. The installed app updates from these releases: it reads
+# latest.json and checks SidekickSetup.exe against the SHA-256 in it (scout/app/update.py).
+# Docs-only pushes don't make a release. "Run workflow" on the Actions tab makes one by hand.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scout/**"
+      - "data/manual/**"
+      - "docs/REPORT_AGENT.md"
+      - "docs/TRAITS.md"
+      - "config.example.yaml"
+      - ".env.example"
+      - "pyproject.toml"
+      - "packaging/**"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # to publish the release
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # tags and history, for "what changed since the last release"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Sidekick, the test tools and PyInstaller (pinned versions)
+        run: python -m pip install -e ".[dev,build]" -c packaging/constraints.txt
+
+      - name: Tests and lint
+        run: |
+          python -m pytest
+          python -m ruff check .
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Version (date and run number)
+        id: version
+        shell: pwsh
+        run: |
+          $d = Get-Date -AsUTC
+          "value=$($d.Year).$($d.Month).$($d.Day).${{ github.run_number }}" >> $env:GITHUB_OUTPUT
+
+      - name: Build the installer
+        run: python packaging/build.py --version ${{ steps.version.outputs.value }}
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $v = "${{ steps.version.outputs.value }}"
+          gh release create "v$v" dist/SidekickSetup.exe dist/latest.json `
+            --title "Sidekick $v" --notes-file dist/notes.md --latest --target $env:GITHUB_SHA

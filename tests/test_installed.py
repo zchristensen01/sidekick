@@ -83,6 +83,8 @@ def test_default_folders(tmp_path, monkeypatch):
     monkeypatch.setattr(paths_module.sys, "frozen", True, raising=False)
     monkeypatch.setattr(paths_module.sys, "_MEIPASS", str(tmp_path / "_internal"), raising=False)
     assert Paths.from_env().root == (tmp_path / "_internal").resolve()  # installed
+    monkeypatch.setenv("SIDEKICK_USER_DIR", str(tmp_path / "trial"))
+    assert Paths.from_env().user == (tmp_path / "trial").resolve()
 
 
 def test_first_start_makes_the_user_folder(tmp_path):

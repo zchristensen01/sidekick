@@ -173,9 +173,10 @@ Drafting/Final --(phase leaves ChampSelect for a non-game phase, or a new champ 
   certificate problem stops it with a message.
 
 ## 7. Recording fixtures (`scout record`, `lcu/recorder.py`)
-Built first (M1) so games played from then on can become test fixtures.
+Built first (M1) to collect real drafts. Recordings stay on the PC that made them (your
+recordings folder); tests use made-up samples in the same format (CLAUDE.md hard rule 10).
 - Save each distinct session snapshot from champ select start to the end, plus part of the
-  gameflow session, to `tests/fixtures/champselect/<date>_<queue>_<myrole>_champ<id>.json` as
+  gameflow session, to `<your Sidekick folder>/recordings/<date>_<queue>_<myrole>_champ<id>.json` as
   `{"meta": {...}, "gameflow": {...}, "snapshots": [{"elapsed_s", "phase", "session"}, ...]}`.
   The champion is its numeric id until static data exists (M2).
 - **Deduplicated**: a change only in `counter`, the timer's countdown fields, or skins isn't a

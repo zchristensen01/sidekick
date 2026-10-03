@@ -102,11 +102,11 @@ Optional, for when the app is closed: a Windows scheduled task running `scout re
 ## What's shared through GitHub, and what stays on each PC
 | Shared (in git; comes with each update) | On each PC only (never in git) |
 |---|---|
-| the code and rules; `data/manual/` (game facts, class definitions, champion notes, matchup briefs, overrides, matchup notes); `research/` prompts, results and status | keys (`.env`), `config.yaml`, champion lists (`pool.yaml`, `pools/`), `data/generated/` (static data, OP.GG numbers, measured data, the review queue), `data/cache/` (downloads, champion pictures, window size), `data/history/` (post-game results, the backtest), `reports/` (each game's report and its History screen) |
+| the code and rules; `data/manual/` (game facts, class definitions, champion notes, matchup briefs, overrides); `research/` prompts, results and status. Players get it with each release (the installer) | everything in `%LOCALAPPDATA%\Sidekick`: keys (`.env`), `config.yaml`, champion lists (`pool.yaml`, `pools/`), your matchup notes, recordings, `data/generated/` (static data, OP.GG numbers, measured data, the review queue), `data/cache/` (downloads, champion pictures, window size), `data/history/` (post-game results, the backtest), `reports/` (each game's report and its History screen) |
 
 So a friend's app builds its own static data and OP.GG numbers (no key needed), and measures
-its own match data only if it has a Riot key. `data/manual/matchup_notes.csv` is shared too, so
-The owner's own notes would show up as "Your notes" on a friend's PC (it's empty so far).
+its own match data only if it's the owner's PC. Matchup notes ("Your notes") are each
+person's own, in their Sidekick folder.
 
 ## Each new patch: the checklist
 1. **Nothing to start**: the app's refresh notices the new Data Dragon version within 6 hours
@@ -132,7 +132,7 @@ The owner's own notes would show up as "Your notes" on a friend's PC (it's empty
 | Riot API: Champion-Mastery-V4, Account-V1, Status-V4 | one-tricks at loading (Account-V1 turns each visible player's Riot ID into Riot's id), the key check | Riot key | at loading; when a key is pasted |
 | The League client (LCU, on your PC) | champ select, who's logged in, region, your recent games and mastery | local, read-only | live |
 | Riot's patch notes (www.leagueoflegends.com/en-us/news/game-updates/) and the LoL Wiki | kit changes, timers, role quests, class descriptions | none | research rounds |
-| GitHub (github.com/zchristensen01/sidekick) | new versions of Sidekick | none (public repo) | start and every 6 hours |
+| GitHub Releases (github.com/zchristensen01/sidekick) | new versions of Sidekick: `latest.json` and `SidekickSetup.exe`, built by GitHub Actions when the app changes (a developer copy uses git) | none (public repo) | start and every 6 hours |
 | Anthropic API | the written report (optional) | Anthropic key | each final report |
 
 Details for each source (endpoints, fields, politeness, failure handling): `DATA.md`.
@@ -161,7 +161,6 @@ Details for each source (endpoints, fields, politeness, failure handling): `DATA
 | `class_definitions.csv` | Riot's own words for each champion class (16 classes) | the LoL Wiki's copy of Riot's 2016 classes dev blog (`class_definitions.md`, 2026-10-03) | nothing, unless Riot changes its classes |
 | `champion_traits.csv` | per champion: the values no source gives (engage, spikes, style, most tags) and the three notes; early game, wave clear and roaming until the collector has 50+ games. `cc`, `escape`, `frontline` and the tags `airborne`, `stealth`, `needs_airborne` are **overridden in memory** by Riot and the wiki (`scout/data/sourced.py`) unless the row's `source` is `owner` | drafted by an LLM from Riot's text (`source=llm`), until reviewed | champions in the review queue (`scout review`) |
 | `matchup_briefs.csv` | how to play one matchup | drafted from Riot's text and OP.GG's labels; reviewed by the owner | `brief_stale` entries in the review queue |
-| `matchup_notes.csv` | the owner's own notes, shown as "Your notes" | the owner | nothing |
 | `champion_overrides.csv` | corrections that win over every source, each with a reason | the owner | whether the source fixed it (then delete the row) |
 
 ## Not data files, but they change with the game

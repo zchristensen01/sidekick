@@ -30,6 +30,7 @@ files stay gitignored).
 | `docs/POLICY.md` | What Riot allows. Read before any feature touching other players or the client |
 | `docs/DECISIONS.md` | Why things are the way they are. Read before changing a design decision |
 | `docs/PATCH_UPDATE.md` | Every data file, its source, how it's refreshed; the new-patch checklist |
+| `docs/DEVELOPING.md` | Developer setup, every `scout` command, releases and the installer |
 | `docs/MATCH_DATA.md` | The games the owner's PC collects: what's kept, what each gives, when it stops |
 | `docs/future/` | Future projects, each with what it should do (the post-game review) |
 | `research/` | Prompts for facts with no automatic source; results go in `research/results/` |
@@ -49,7 +50,8 @@ files stay gitignored).
    patch notes). If no reputable source exists, leave it blank, add it to the review queue, and
    add a research prompt for the owner to run (`scout/research.py` writes the prompts in `research/`;
    don't edit those files by hand).
-4. **`data/generated/` is machine-owned**: rebuilt by `scout refresh`, never hand-edited.
+4. **`data/generated/` is machine-owned** (in each user's Sidekick folder, `%LOCALAPPDATA%\Sidekick`):
+   rebuilt by `scout refresh`, never hand-edited.
    **`data/manual/` is hand-owned**: never overwritten by code. Only append, or edit through
    `scout review` with confirmation.
 5. **Secrets** (Riot API key, Anthropic key) live in `.env`, never in code or git.
@@ -70,7 +72,10 @@ files stay gitignored).
   the League client. Offline commands and `pytest` run anywhere.
 - From WSL in the default NAT networking mode, the client's local port is unreachable: use
   Windows Python for live work.
-- Setup and every command: `README.md`. `scout doctor` checks the setup.
+- Players install `SidekickSetup.exe` (`README.md`); developers: `docs/DEVELOPING.md` (setup,
+  every command, how releases are built). `scout doctor` checks the setup.
+- Each user's files (settings, keys, champion lists, reports, data) are in
+  `%LOCALAPPDATA%\Sidekick`, for the installed app and a developer copy alike (`scout/paths.py`).
 
 ## Commands
 ```
@@ -100,7 +105,7 @@ ruff check .                 # lint
 | "This report was wrong" + the report | Find the cited rule IDs, insights and facts. Decide whether the **trait data**, the **insight formula**, the **rule condition**, or the **rule text** is wrong. Fix the smallest thing. Add a made-up fixture in `tests/fixtures/games/` that reproduces the case (not the real game: hard rule 10) and a golden file asserting the corrected result. Log it in `docs/CHANGELOG.md`. |
 | A new rule idea ("vs X you should...") | Add it to `scout/rules/league_rules.yaml` with a new ID, the right `section` and `audience`, existing paths, and a `tests` block. If it needs a new path, add it in `scout/rules/context.py` and document it in `docs/RULES.md`. |
 | "Champ X's traits are off" | Edit that row in `data/manual/champion_traits.csv` (the owner is the source of truth). Set `reviewed=y`, `reviewed_patch` to the current version, `source=owner`. |
-| A matchup note ("Lee vs Elise: ...") | Append a row to `data/manual/matchup_notes.csv`. These show in reports as "Your notes". |
+| A matchup note ("Lee vs Elise: ...") | Append a row to the owner's own `matchup_notes.csv` in `%LOCALAPPDATA%\Sidekick` (shown as "Your notes"). It stays on their PC, never in git. |
 | "This matchup advice is off" | Fix the row in `data/manual/matchup_briefs.csv` (or the champion's `key_note`/`ult_note`/`spike_note` if the problem is the champion, not the matchup). Set `reviewed=y`. |
 | Patch notes (pasted text or a link) | List the champions with kit changes, add them to the review queue with the reason, and **propose** trait edits. Don't apply edits without their OK. |
 | A champ select JSON or a game description | Run `scout report` on it. If a test needs it, make a made-up fixture from it (champions swapped, no dates or times; hard rule 10), never the real game. |

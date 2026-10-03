@@ -131,10 +131,13 @@ Limits we have to live with:
   10 once the collector has 50+ games (M19, Riot match data above).
 
 ## Storage layout
+`data/manual/` is in the repo (and inside the installed app). Everything else is in each
+user's own Sidekick folder, `%LOCALAPPDATA%\Sidekick` (`scout/paths.py`, DECISIONS #113), with
+the same subfolders, plus `matchup_notes.csv` ("Your notes") and `recordings/`.
 ```
 data/
   manual/                          # hand-owned, committed (TRAITS.md)
-    champion_traits.csv  matchup_briefs.csv  matchup_notes.csv  champion_overrides.csv
+    champion_traits.csv  matchup_briefs.csv  champion_overrides.csv
     game_facts.csv                 # cited timers and role quests (docs/PATCH_UPDATE.md)
     class_definitions.csv          # Riot's own words for each class (research, M19)
   generated/                       # machine-owned, gitignored, safe to delete and rebuild

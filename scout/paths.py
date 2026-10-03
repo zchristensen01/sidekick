@@ -8,7 +8,8 @@ Two folders (DECISIONS #113):
   recordings, downloaded and measured data. `%LOCALAPPDATA%\\Sidekick` for both the installed
   app and a developer copy, so nothing personal ever sits in the repo folder.
 
-Set the SCOUT_HOME environment variable to keep everything in one folder instead (tests do).
+Set SCOUT_HOME to keep everything in one folder instead (tests do), or SIDEKICK_USER_DIR to
+move only this user's files.
 """
 
 import os
@@ -32,7 +33,11 @@ def program_dir() -> Path:
 
 
 def user_dir() -> Path:
-    """This user's own Sidekick folder (created on first use)."""
+    """This user's own Sidekick folder (created on first use). SIDEKICK_USER_DIR moves it
+    (for trying a build without touching your real files)."""
+    moved = os.environ.get("SIDEKICK_USER_DIR")
+    if moved:
+        return Path(moved).resolve()
     if sys.platform == "win32":
         local = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
         return Path(local) / APP_NAME

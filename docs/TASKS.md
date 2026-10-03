@@ -503,19 +503,27 @@ labelled.
       pushes that expose my email" (Settings, Emails)
 
 ## M24. A real installer (2026-10-03: "no commands at all, safe, looks and feels professional")
-- [ ] Program files and personal files apart: the program in `%LOCALAPPDATA%\Programs\Sidekick`,
-      each Windows user's settings, keys, champion lists, reports, recordings and data in
-      `%LOCALAPPDATA%\Sidekick` (the developer copy uses the same folder)
-- [ ] `Sidekick.exe` built with PyInstaller (its own Python inside), a hidden helper for data
-      refreshes, version and icon in the file details
-- [ ] Inno Setup installer: per user (no admin), Start menu and Desktop, uninstall entry, WebView2
+- [x] Program files and personal files apart: the program in `%LOCALAPPDATA%\Programs\Sidekick`,
+      each Windows user's settings, keys, champion lists, notes, reports, recordings and data
+      in `%LOCALAPPDATA%\Sidekick` (the developer copy uses the same folder; DECISIONS #113)
+- [x] `Sidekick.exe` built with PyInstaller (its own Python inside), `sidekick-helper.exe` for
+      data refreshes, version and icon in the file details (`packaging/`, #114)
+- [x] Inno Setup installer: per user (no admin), Start menu and Desktop, uninstall entry, WebView2
       if missing, waits for Sidekick to close, reopens it after an update, asks before deleting
-      your settings on uninstall
-- [ ] Updates from GitHub Releases (no Git needed), checked against a published SHA-256
-- [ ] GitHub Actions: tests, lint, build and publish a release when the app changes
-- [ ] README for beginners: download, the two Windows warnings, first start, your champions,
-      the keys, updates, removing the old version (REQUESTS A14, B26, B27)
-- [ ] Tested: a clean install, an update between two releases, an uninstall
+      your settings on uninstall (#114)
+- [x] Updates from GitHub Releases (no Git needed), checked against a published SHA-256 (#117);
+      offline tests in `tests/test_installed.py`
+- [x] GitHub Actions: tests, lint, build and publish a release when the app changes (#115)
+- [x] README for beginners: download, the two Windows warnings, first start, your champions,
+      the keys, updates, removing the old version (REQUESTS A14, B26, B27); the developer
+      material in `docs/DEVELOPING.md`
+- [x] Tested locally: the build, the app's first start from the built folder (settings made in
+      the user folder, champion data downloaded by the helper, the window)
+- [ ] Tested on GitHub: the first release from Actions; a clean install from the README link;
+      an update from one release to the next; an uninstall
+- [ ] The owner: play a game on the installed app (installed like any player's: `owner` stays
+      false on this PC for now, at the owner's request; set `owner: true` in config.yaml to
+      make it the owner's PC again)
 
 ## Parked (the owner decides when)
 - [ ] Live in-game numbers (your lane's gold and item lead, levels, CS) from the game's own

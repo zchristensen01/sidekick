@@ -2,6 +2,12 @@
 
 One line per finished task or fix: date, what changed, why.
 
+- 2026-10-03: M24, a real installer: `SidekickSetup.exe` (PyInstaller app with its own Python,
+  Inno Setup, per user, no admin, WebView2 when missing); each user's files in
+  `%LOCALAPPDATA%\Sidekick`, the program in `%LOCALAPPDATA%\Programs\Sidekick`; updates from
+  GitHub Releases checked against a published SHA-256; a release on every app change, built by
+  GitHub Actions after the tests; matchup notes per person; research and shortcuts on the
+  developer copy only; a beginner README and `docs/DEVELOPING.md`.
 - 2026-10-03: Collected match data, the owner's PC only (docs/MATCH_DATA.md): `owner: true` in
   config.yaml marks it; only it collects games, runs the backtest and gets research reminders,
   and Settings hides those parts elsewhere. Collecting stops at 4,000 games per patch and older

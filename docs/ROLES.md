@@ -175,7 +175,7 @@ stands out here for this draft."); the others appear only when they have items.
 7. **Protect or engage**: which enemy threatens your carry most, and your job in fights.
 8. **Game plan** (always).
 
-All roles add **Your notes** (from `data/manual/matchup_notes.csv`) and **Warnings** when present.
+All roles add **Your notes** (from the user's own `matchup_notes.csv`) and **Warnings** when present.
 Laners also get **Watch out for** and **Don't let them get fed** (one item each) before the game
 plan. **Counter-pick** is never forced, for any role: it appears whenever my lane opponent (the
 enemy jungler, for a jungler) is known, from OP.GG's numbers or, without them, a structural read

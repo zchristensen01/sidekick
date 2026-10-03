@@ -21,6 +21,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]
+build = ["pyinstaller>=6.20"]  # packaging/build.py: the installed app
 
 [project.scripts]
 scout = "scout.cli:app"

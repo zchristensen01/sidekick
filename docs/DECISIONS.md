@@ -3,6 +3,44 @@
 Short record of design decisions and why, so they don't get re-argued. Newest first. To change
 one, add a new entry that supersedes it rather than editing the old one.
 
+## 2026-10-03: M24 (a real installer)
+113. **The program's files and each user's own files are apart** (`scout/paths.py`): `root` is
+     the program (the repo, or the installed app's `_internal`), `home` is
+     `%LOCALAPPDATA%\Sidekick` with settings, keys, champion lists, matchup notes, reports,
+     recordings and all downloaded or measured data. A developer copy uses the same home, so
+     nothing personal ever sits in the repo folder and the installed app and a developer copy
+     see the same files. Matchup notes ("Your notes") moved out of `data/manual/`: they're each
+     person's own. `SCOUT_HOME` still keeps everything in one folder (tests);
+     `SIDEKICK_USER_DIR` moves only the user's files (trying a build).
+114. **The installed app is a PyInstaller folder wrapped in an Inno Setup installer.** One
+     folder, not one file: it starts faster and trips antivirus programs less. Two programs
+     share it: `Sidekick.exe` (no console) and `sidekick-helper.exe` (the `scout` commands with
+     a console), because the hidden data refresh streams its lines to the app and a windowed
+     program has no output to read. The installer works per user (no admin), adds Start menu
+     and Desktop shortcuts with Sidekick's taskbar id (pinning works, the M14 gap), installs
+     WebView2 only if it's missing, clears the old program folder before copying, and on
+     uninstall asks before deleting the user's folder (default: keep).
+115. **A release on every push to main that changes the app**, built and published by GitHub
+     Actions after the tests and lint pass, so players get fixes as fast as git users did.
+     Docs-only pushes don't make one. The version is the build date plus the run number
+     (`2026.10.5.12`), which only goes up; library versions are pinned
+     (`packaging/constraints.txt`) so a release can't break because a library changed.
+116. **Not code-signed** (the owner's call: no monthly certificate fee). The browser's "isn't
+     commonly downloaded" and Windows' "Windows protected your PC" are explained step by step
+     in the README; Smart App Control can't be clicked past, so the README says how to turn it
+     off and that it may be permanent. Updates are downloaded by the app, not a browser, so
+     they don't trigger the warnings again.
+117. **Updates check before they run anything**: `latest.json` must point at an installer on
+     Sidekick's own releases page and carry its SHA-256; a download that doesn't match is
+     deleted. The quiet install waits up to a minute for the app's lock (`Local\SidekickScoutApp`)
+     to go, then reopens Sidekick; the app checks its version on start and says plainly if the
+     update didn't finish. A developer copy keeps the git update (#66).
+118. **Developer-only parts stay off the installed app**: research (its replies and status live
+     in the repo), the shortcut button (the installer makes the shortcuts) and
+     `tools/dev_setup.ps1` (was install.ps1). A developer copy's shortcuts are named
+     "Sidekick (developer)" so they never replace the installed app's. Messages a player can
+     see never tell them to run a command.
+
 ## 2026-10-03: M25 (nothing personal in git)
 110. **The repo started over with one clean first commit** (the owner: nothing of theirs on
      GitHub, at any point). The old history had a personal email on every commit, a Windows
