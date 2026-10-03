@@ -368,4 +368,4 @@ def regenerate(paths: Paths) -> list[Path]:
     row = research_import.done_rows(paths).get("patch_notes") or {}
     files = prompts(champions(tables), facts, version, updates,
                     row.get("done_on", "") if updates else "")  # fmt: skip
-    return write(paths.root / "research", files)
+    return write(paths.research_dir, files)

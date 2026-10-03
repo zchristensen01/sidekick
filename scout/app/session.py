@@ -120,7 +120,7 @@ def build_session(paths: Paths, config: Config, *, record: bool = True, llm: boo
     version = current_version(paths)
     tables = load_static(paths, version) if version else {}
     if not version or not tables:
-        raise SetupError("No champion data yet: run `scout refresh` (the app does it for you).")
+        raise SetupError("No champion data yet: press Refresh data in Settings (needs internet).")
     try:
         knowledge = load_knowledge(paths, version)
         rules = load_rules(paths.rules_file)
@@ -130,14 +130,14 @@ def build_session(paths: Paths, config: Config, *, record: bool = True, llm: boo
     find = lambda: discover(config.client.lockfile_path)  # noqa: E731
     client = LcuClient(find)
     reports = paths.reports_dir(config.report.save_dir)
-    recorder = Recorder(client, paths.fixtures_dir / "champselect", echo=echo) if record else None
+    recorder = Recorder(client, paths.recordings_dir, echo=echo) if record else None
     stats = stats_service(paths, config, version, tables, online=stats_online)
     wiki_rates = rates_from_wiki_positions(tables["champion_meta.csv"])
     watcher = Watcher(
         client=client, knowledge=knowledge, rules=rules,
         rates=merged_rates(stats.role_rates(), wiki_rates),
         index=ChampionIndex.from_static(version, tables), reports_dir=reports,
-        notes=read_csv(paths.manual_dir / "matchup_notes.csv"),
+        notes=read_csv(paths.notes_file),
         low_confidence=config.roles.low_confidence_below,
         recorder=recorder, echo=echo,
         writer=make_writer(config, paths, knowledge, echo) if llm else None,

@@ -95,7 +95,8 @@ def test_unknown_champion_is_a_placeholder_with_one_note():
     session["actions"][0][0].update(championId=9999, completed=True)  # also banned
     game = parse_session(session, INDEX, RATES)
     assert "Unknown9999" in {p.champ_id for p in game.enemy.values()}
-    assert game.notes == ["Unknown champion id 9999: probably new; run `scout refresh` to add it."]
+    note = "Unknown champion id 9999: probably new; Refresh data (Settings) adds it."
+    assert game.notes == [note]
 
 
 def test_pick_turns_ignore_everything_but_completed_picks():

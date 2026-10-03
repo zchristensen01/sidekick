@@ -35,7 +35,6 @@ CHAMPION_OVERRIDES = ("champ_id", "field", "value", "reason")
 MANUAL_FILES: dict[str, tuple[str, ...]] = {
     "champion_traits.csv": CHAMPION_TRAITS,
     "matchup_briefs.csv": MATCHUP_BRIEFS,
-    "matchup_notes.csv": MATCHUP_NOTES,
     "champion_overrides.csv": CHAMPION_OVERRIDES,
     "game_facts.csv": GAME_FACTS,
     "class_definitions.csv": CLASS_DEFINITIONS,

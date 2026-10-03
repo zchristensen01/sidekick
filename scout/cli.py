@@ -125,7 +125,7 @@ def doctor() -> None:
     if platform.system() == "Windows":
         found = launcher()
         line("ok" if found else "--", "sidekick.exe " + ("installed" if found else
-             "missing: run `pip install -e .` (install.ps1 does it)"))  # fmt: skip
+             "missing: run tools/dev_setup.ps1"))  # fmt: skip
 
     # Secrets: presence only
     secrets = config.secrets if config else load_secrets(paths.env_file)
@@ -448,7 +448,7 @@ def _refresh_static(paths: Paths, force: bool, prune: bool) -> bool:
 @app.command()
 def watch(
     no_record: Annotated[
-        bool, typer.Option("--no-record", help="Don't save champ selects as test fixtures.")
+        bool, typer.Option("--no-record", help="Don't save champ selects to your recordings.")
     ] = False,
     no_window: Annotated[
         bool, typer.Option("--no-window", help="Terminal only, no report window.")
@@ -483,7 +483,7 @@ def watch(
         raise typer.Exit(code=1) from None
     typer.echo(f"Watching for champion select (patch data {session.version}). Ctrl+C to stop.")
     typer.echo(f"Reports are saved to {session.reports}" + ("" if no_record else
-               "; champ selects are recorded as test fixtures."))  # fmt: skip
+               "; champ selects are recorded (scrubbed) in your recordings folder."))  # fmt: skip
     try:
         if no_window:
             watch_until_stopped(
@@ -578,7 +578,7 @@ def report(
     finally:
         stats.close()
     insights = analyze(game, knowledge, game_stats, _bands(config))
-    notes = read_csv(paths.manual_dir / "matchup_notes.csv")
+    notes = read_csv(paths.notes_file)
     chosen = select_report(insights, evaluate(rules, insights), notes,
                            config.roles.low_confidence_below)  # fmt: skip
     typer.echo(render_text(chosen, debug=debug), nl=False)
@@ -717,7 +717,7 @@ def demo(
     def report_screen() -> dict[str, Any]:  # the demo has no LLM: the rules version
         insights = analyze(game, knowledge, stats.for_game(game), _bands(config))
         chosen = select_report(insights, evaluate(rules, insights),
-                               read_csv(paths.manual_dir / "matchup_notes.csv"),
+                               read_csv(paths.notes_file),
                                config.roles.low_confidence_below)  # fmt: skip
         return report_view(chosen, insights, None, "final")
 
@@ -881,7 +881,7 @@ def shortcut() -> None:
 
     paths = Paths.from_env()
     try:
-        made = shortcuts.create(paths.root)
+        made = shortcuts.create(paths.user)
     except shortcuts.ShortcutError as exc:
         typer.echo(f"No shortcut: {exc}", err=True)
         raise typer.Exit(code=1) from None
@@ -902,7 +902,7 @@ def review(
     version, tables = _static_or_exit(paths)
     rows = read_csv(paths.manual_dir / "champion_traits.csv")
     champ_by_key = {int(r["key"]): r["champ_id"] for r in tables["champions.csv"]}
-    recent = recent_champions(paths.fixtures_dir / "champselect", champ_by_key)
+    recent = recent_champions(paths.recordings_dir, champ_by_key)
     pool = [c for champs in champion_lists(_pool_or_exit(paths, config)).values()
             for c in champs]  # fmt: skip
     items = review_order(rows, review_queue_open(paths.review_queue), recent, pool, champ)
@@ -961,7 +961,7 @@ def draft_traits(
     failed = 0
     for target in targets:
         try:
-            result = draft_row(target, tables, context, paths.root / "docs" / "TRAITS.md",
+            result = draft_row(target, tables, context, paths.traits_doc,
                                examples, ask, version)  # fmt: skip
         except DraftError as exc:
             typer.echo(f"{target}: {exc}", err=True)
@@ -989,12 +989,12 @@ def record(
         bool, typer.Option("--all-queues", help="Also record ARAM, customs and other queues.")
     ] = False,
 ) -> None:
-    """Save scrubbed champion select sessions as test fixtures (Windows only)."""
+    """Save scrubbed champion select sessions to your recordings folder (Windows only)."""
     paths = Paths.from_env()
     config = _config_or_exit(paths)
     if platform.system() != "Windows":
         typer.echo("Warning: the League client is usually only reachable from Windows Python.")
-    out_dir = paths.fixtures_dir / "champselect"
+    out_dir = paths.recordings_dir
     client = LcuClient(lambda: discover(config.client.lockfile_path))
     recorder = Recorder(client, out_dir, all_queues=all_queues, echo=typer.echo)
     typer.echo(f"Recording champion selects to {out_dir}")
@@ -1060,7 +1060,7 @@ def postgame(
             append_note(paths, {"role": saved.my_role, "champ_id": saved.my_champion,
                                 "opp_champ_id": opp, "note": text,
                                 "date": date.today().isoformat()})  # fmt: skip
-            typer.echo("Added to data/manual/matchup_notes.csv (shown as \"Your notes\").")
+            typer.echo(f"Added to {paths.notes_file} (shown as \"Your notes\").")
 
 
 @app.command()

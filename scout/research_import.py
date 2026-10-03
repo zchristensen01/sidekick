@@ -122,7 +122,7 @@ def _check(kind: str, row: Mapping[str, str], known: set[str]) -> str:
 
 def plan(paths: Paths, champions: Iterable[str], now: datetime,
          files: Sequence[Path] | None = None) -> Plan:  # fmt: skip
-    folder = paths.root / "research" / "results"
+    folder = paths.research_dir / "results"
     found = files if files is not None else sorted(
         p for p in folder.glob("*.md") if p.name.lower() != "readme.md"
     )  # fmt: skip
@@ -167,7 +167,7 @@ def plan(paths: Paths, champions: Iterable[str], now: datetime,
 
 
 def status_file(paths: Paths) -> Path:
-    return paths.root / "research" / "status.csv"
+    return paths.research_dir / "status.csv"
 
 
 def record_done(paths: Paths, prompts: Iterable[str], patch: str, when: str) -> None:
@@ -232,7 +232,7 @@ def apply(paths: Paths, p: Plan, patch: str = "") -> list[str]:
         rows |= {r["class"].lower(): r for r in p.classes}
         write_csv(path, CLASS_DEFINITIONS, sorted(rows.values(), key=lambda r: r["class"]))
         done.append(f"class definitions: {len(p.classes)}")
-    target = paths.root / "research" / "results" / "done"
+    target = paths.research_dir / "results" / "done"
     kinds = set()
     for reply in p.replies:
         if reply.tables:

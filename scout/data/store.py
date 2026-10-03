@@ -236,8 +236,8 @@ def traits_for(
 
 
 def append_note(paths: Paths, row: Row) -> None:
-    """Append one of the owner's matchup notes (data/manual/matchup_notes.csv; append only)."""
-    path = paths.manual_dir / "matchup_notes.csv"
+    """Append one of this user's matchup notes (matchup_notes.csv in their folder; append only)."""
+    path = paths.notes_file
     if not path.exists():
         write_csv(path, MATCHUP_NOTES, [])
     text = path.read_text(encoding="utf-8")

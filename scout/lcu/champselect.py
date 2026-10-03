@@ -48,7 +48,7 @@ class ChampionIndex:
         """Data Dragon id for a client key; a placeholder (and a note) for unknown keys."""
         if key in self.by_key:
             return self.by_key[key]
-        notes.append(f"Unknown champion id {key}: probably new; run `scout refresh` to add it.")
+        notes.append(f"Unknown champion id {key}: probably new; Refresh data (Settings) adds it.")
         return f"Unknown{key}"
 
 

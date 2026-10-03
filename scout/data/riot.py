@@ -105,7 +105,7 @@ class RiotApi:
             return None
         if response.status_code in (401, 403):
             raise RiotError("Riot API key rejected: expired or wrong (development keys last 24 "
-                            "hours; `scout key` swaps in a new one)")
+                            "hours; paste a new one in Settings, Account and Riot key)")
         if response.status_code == 429:
             raise RiotError("Riot API rate limit reached; try again in a couple of minutes")
         if response.status_code >= 400:

@@ -1,8 +1,9 @@
-"""Desktop and Start-menu shortcuts to Sidekick (M14).
+"""Desktop and Start-menu shortcuts to a developer copy of Sidekick (M14).
 
-Made with Windows' own shortcut maker (WScript.Shell, through PowerShell), so no extra
-packages. The shortcut opens the `sidekick` launcher that pip puts next to Python
-(.venv/Scripts/sidekick.exe), with the Sidekick icon.
+The installed app's shortcuts come from its installer (packaging/sidekick.iss). A developer
+copy's are named "Sidekick (developer)" so they never replace those. Made with Windows' own
+shortcut maker (WScript.Shell, through PowerShell), so no extra packages. The shortcut opens
+the `sidekick` launcher that pip puts next to Python (.venv/Scripts/sidekick.exe).
 """
 
 import ctypes
@@ -11,8 +12,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scout.paths import frozen
+
 ICON = Path(__file__).with_name("sidekick.ico")
-NAME = "Sidekick.lnk"
+NAME = "Sidekick.lnk" if frozen() else "Sidekick (developer).lnk"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 DESKTOP, PROGRAMS = 0x10, 0x02  # CSIDL_DESKTOPDIRECTORY, CSIDL_PROGRAMS (the Start menu)
 SCRIPT = """
@@ -60,8 +63,8 @@ def create(workdir: Path) -> list[Path]:
     """Make (or update) both shortcuts. Raises ShortcutError with a plain reason."""
     target = launcher()
     if target is None:
-        raise ShortcutError("No sidekick.exe next to Python yet: run `pip install -e .` "
-                            "(install.ps1 does it), then try again.")  # fmt: skip
+        raise ShortcutError("No sidekick.exe next to Python yet: run tools/dev_setup.ps1, "
+                            "then try again.")  # fmt: skip
     made = links()
     if not made:
         raise ShortcutError("Shortcuts only work on Windows.")

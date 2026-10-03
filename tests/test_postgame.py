@@ -130,7 +130,7 @@ def test_scout_postgame_command(scout_home, knowledge, monkeypatch):
     result = CliRunner().invoke(scout.cli.app, ["postgame"], input="Dodge the Q at level 2\n")
     assert result.exit_code == 0, result.output
     assert "Post-game check:" in result.output
-    notes = (scout_home.manual_dir / "matchup_notes.csv").read_text(encoding="utf-8")
+    notes = scout_home.notes_file.read_text(encoding="utf-8")
     assert "jungle,Jax,Ambessa,Dodge the Q at level 2," in notes
     again = CliRunner().invoke(scout.cli.app, ["postgame"])
     assert "Nothing to check" in again.output

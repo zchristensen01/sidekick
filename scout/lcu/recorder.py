@@ -1,11 +1,12 @@
-"""`scout record`: save scrubbed champ select sessions as test fixtures.
+"""`scout record`: save scrubbed champ select sessions to the user's recordings folder.
 
 While it runs, it polls the client every `client.poll_seconds`. During champion select it keeps
 every distinct session snapshot; when champion select ends (game start, dodge, or Ctrl+C) it
-writes one JSON file to tests/fixtures/champselect/. If the game starts, the file also gets the
-roster the game shows at loading (champions, positions, summoner spells), the answer key for
-enemy roles. Everything is scrubbed before it's kept (docs/LCU.md section 7, docs/POLICY.md).
-Read-only, like everything in scout/lcu/.
+writes one JSON file to the recordings folder (never the repo: CLAUDE.md hard rule 10; the
+made-up samples for tests are in tests/fixtures/champselect/). If the game starts, the file
+also gets the roster the game shows at loading (champions, positions, summoner spells), the
+answer key for enemy roles. Everything is scrubbed before it's kept (docs/LCU.md section 7,
+docs/POLICY.md). Read-only, like everything in scout/lcu/.
 """
 
 import json

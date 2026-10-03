@@ -30,10 +30,10 @@ class ReviewItem:
     reasons: list[str]
 
 
-def recent_champions(fixtures_dir: Path, champ_by_key: dict[int, str]) -> list[str]:
+def recent_champions(recordings: Path, champ_by_key: dict[int, str]) -> list[str]:
     """Champions in recorded champ selects, newest recording first (each listed once)."""
     seen: list[str] = []
-    files = sorted(fixtures_dir.glob("*.json"), key=lambda p: p.name, reverse=True)
+    files = sorted(recordings.glob("*.json"), key=lambda p: p.name, reverse=True)
     for path in files:
         try:
             session = json.loads(path.read_text(encoding="utf-8"))["snapshots"][-1]["session"]

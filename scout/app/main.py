@@ -1,16 +1,17 @@
-"""Sidekick.exe (M14): the app, with no command line.
+"""Sidekick.exe (M14, M24): the app, with no command line.
 
-`sidekick` (a no-console launcher pip makes from pyproject's gui-scripts; install.ps1 puts it
-on the Desktop and in the Start menu) opens the window and does what `scout watch` does, plus
-what used to need a terminal:
+The installed app (`Sidekick.exe`, packaging/) and a developer copy's `sidekick` launcher
+(pip's no-console launcher from pyproject's gui-scripts) open the window and do what
+`scout watch` does, plus what used to need a terminal:
 
 - first run: makes config.yaml, .env and pool.yaml, downloads the champion data;
 - Champions: your champions per lane with a 1-5 comfort rating, one list per account (M22);
 - History: past games on this PC, each with its dashboard (M23);
 - Settings: your account and region (from the client), the AI writer, the Riot and Anthropic
   keys (tested before they're saved), the match data collector, research, Refresh data;
-- background: the data refresh every 6 hours, Riot's match data, the GitHub update check;
-- Update: checks GitHub, pulls, restarts (scout/app/update.py).
+- background: the data refresh every 6 hours, Riot's match data, the update check;
+- Update: the newest release (installed) or git (a developer copy), then a restart
+  (scout/app/update.py).
 
 `scout watch` opens the same app (and also prints to the terminal). Messages go to
 reports/debug/app.log. Changes that need a fresh start (new data, a new region) wait until
@@ -49,15 +50,25 @@ from scout.app import shortcut
 from scout.app.portraits import Portraits, http_get
 from scout.app.session import Echo, Session, SetupError, build_session, make_writer
 from scout.app.update import (
+    Status,
     UpdateError,
-    console_python,
+    check_release,
+    download_release,
     hand_off,
+    http_client,
+    install_release,
+    latest_release,
     marker_file,
     pull,
     read_marker,
     refreshed_file,
+    release_marker,
+    scout_command,
+    updates_dir,
+    version_key,
+    write_marker,
 )
-from scout.app.update import check as check_update
+from scout.app.update import check as check_git
 from scout.app.update import git as run_git
 from scout.config import Config, ConfigError, load_config, with_env_value, with_value
 from scout.data.collector import COLLECTOR_LIMITS, Collector
@@ -70,13 +81,14 @@ from scout.data.store import current_version, load_static
 from scout.lcu.client import CHAMPION_MASTERY, CURRENT_SUMMONER, RECENT_GAMES, LcuError
 from scout.lcu.watcher import run as watch_until_stopped
 from scout.model.roles import Role
-from scout.paths import Paths
+from scout.paths import Paths, frozen
 from scout.picks import parse_mastery
 from scout.pool import HIGHEST, LOWEST, Pool, PoolError, load_pool, save_pool
 from scout.report import past
 from scout.report.view import status_view
 from scout.report.writer import usage_today
 from scout.research import regenerate as regenerate_prompts
+from scout.version import current_build
 
 # Riot API routing per region (Riot's developer docs: platform and regional routing values).
 REGIONS: dict[str, tuple[str, str]] = {
@@ -93,7 +105,8 @@ DUE_EVERY_S = 60.0  # how often "research due" is worked out again
 REFRESH_EVERY_S = 6 * 3600.0  # the app refreshes the data by itself when it's this old
 REFRESH_CHECK_S = 300.0  # how often it looks whether a refresh is due
 COLLECT_BATCH = 20  # games per run (it stops early when a game starts)
-MUTEX = "Local\\SidekickScoutApp"
+MUTEX = "Local\\SidekickScoutApp"  # the installer waits on it too (packaging/sidekick.iss)
+NO_RESEARCH = "Research runs on the developer copy; its results come with updates."
 
 
 class Log:
@@ -117,6 +130,7 @@ class Log:
 
 def first_run(paths: Paths) -> list[str]:
     """config.yaml and .env from the examples, and an empty pool.yaml, when missing."""
+    paths.user.mkdir(parents=True, exist_ok=True)
     made = []
     if not paths.config_file.exists() and paths.config_example.exists():
         shutil.copy(paths.config_example, paths.config_file)
@@ -167,6 +181,9 @@ class App:
         self.region_seen: str | None = None  # the region the client's games are on (REGIONS)
         self._region_for = ""  # the account whose region was last checked
         self.update_available: dict[str, Any] | None = None  # from the background check
+        self.installed = frozen()  # the installed app (updates from releases), not the repo
+        self.build = current_build(paths)
+        self.can_research = not self.installed  # research runs on a developer copy (the repo)
         self._due: dict[str, Any] = {}
         self._due_at = 0.0
 
@@ -194,6 +211,8 @@ class App:
     def research_due(self) -> dict[str, Any]:
         """Prompts in research/ to run for the current patch (M21), worked out once a minute.
         `remind`: whether the top bar shows it (Settings; only whoever runs the research)."""
+        if not self.can_research:
+            return {}
         now = time.monotonic()
         if now - self._due_at > DUE_EVERY_S:
             self._due_at = now
@@ -219,10 +238,10 @@ class App:
                 wait = REFRESH_CHECK_S  # not in champ select or a game: look again a bit later
                 continue
             wait = UPDATE_EVERY_S
-            status = check_update(self.paths.root)
+            status = self._check_status()
             if status.available:
-                self.update_available = {"behind": status.behind, "commits": status.commits[:5]}
-                self.log(f"Update available: {status.behind} change(s).")
+                self.update_available = self._offer(status)
+                self.log(f"Update available: {status.version or status.behind}.")
             else:
                 self.update_available = None
 
@@ -401,10 +420,12 @@ class App:
         return {"started": True}
 
     def _refresh_process(self) -> bool:
-        """`scout refresh --pool` in a hidden child process, its lines shown as progress."""
-        env = dict(os.environ, SCOUT_HOME=str(self.paths.root), PYTHONIOENCODING="utf-8")
+        """`scout refresh --pool` in a hidden child process, its lines shown as progress. The
+        child works out the same folders (scout/paths.py) from the same environment."""
+        env = dict(os.environ, PYTHONIOENCODING="utf-8")
+        self.paths.user.mkdir(parents=True, exist_ok=True)
         process = subprocess.Popen(
-            [console_python(), "-m", "scout", "refresh", "--pool"], cwd=self.paths.root,
+            scout_command("refresh", "--pool"), cwd=self.paths.user,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
             errors="replace", env=env, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )  # fmt: skip
@@ -419,6 +440,14 @@ class App:
         return ok
 
     def _finish_update(self, marker: Any) -> None:
+        if self.installed:
+            for old in updates_dir(self.paths).glob("SidekickSetup-*"):
+                old.unlink(missing_ok=True)  # the installer did its job (or is fetched again)
+            if version_key(self.build.version) < version_key(marker.after):
+                self.notice = (f"The update to {marker.after} didn't finish; this is still "
+                               f"{self.build.version}. Try Update again in Settings.")  # fmt: skip
+                marker_file(self.paths).unlink(missing_ok=True)
+                return
         if marker.install_ok is False:
             log = self.paths.reports_dir() / "debug" / "update.log"
             log.parent.mkdir(parents=True, exist_ok=True)
@@ -497,8 +526,10 @@ class App:
             if session is not None:
                 riot_state = "working" if session.watcher.riot is not None else "rejected"
         return {
-            "app": {"commit": self._commit(), "patch": current_version(self.paths) or "",
+            "app": {"commit": self._version_text(), "patch": current_version(self.paths) or "",
                     "data_at": self._data_time(), "shortcut": shortcut.exists(),
+                    "installed": self.installed, "can_research": self.can_research,
+                    "folder": str(self.paths.user),
                     "in_game": session is not None and not session.watcher.idle()},
             "account": {"logged_in": account.riot_id if account else "", "live": live,
                         "region": region, "regions": list(REGIONS),
@@ -515,12 +546,17 @@ class App:
             "research": self.research_due(),
         }  # fmt: skip
 
-    def _commit(self) -> str:
+    def _version_text(self) -> str:
+        """'2026.10.4.12 (built 2026-10-04)' installed; 'developer copy, abc1234, ...' else."""
+        if self.installed:
+            built = f" (built {self.build.built})" if self.build.built else ""
+            return self.build.version + built
         try:
-            return run_git(self.paths.root, "log", "-1", "--format=%h, %cd", "--date=short",
-                           timeout=10)  # fmt: skip
+            commit = run_git(self.paths.root, "log", "-1", "--format=%h, %cd", "--date=short",
+                             timeout=10)  # fmt: skip
         except UpdateError:
-            return ""
+            commit = ""
+        return "developer copy" + (f", {commit}" if commit else "")
 
     def _data_time(self) -> str:
         try:
@@ -759,6 +795,8 @@ class App:
 
     def _research_plan(self, _: dict[str, Any]) -> dict[str, Any]:
         """What the agents' replies in research/results/ would change (nothing is written)."""
+        if not self.can_research:
+            return {"error": NO_RESEARCH}
         found = research_import.plan(self.paths, list(self.champion_names()),
                                      datetime.now().astimezone())  # fmt: skip
         return {"lines": found.lines(), "empty": found.empty,
@@ -766,6 +804,8 @@ class App:
 
     def _research_apply(self, _: dict[str, Any]) -> dict[str, Any]:
         """Apply them (the page asked the owner first); re-planned so it's what they just saw."""
+        if not self.can_research:
+            return {"error": NO_RESEARCH}
         found = research_import.plan(self.paths, list(self.champion_names()),
                                      datetime.now().astimezone())  # fmt: skip
         if found.empty:
@@ -887,10 +927,21 @@ class App:
         elif not auto:
             self.notice = "Data refreshed."
 
+    def _check_status(self) -> Status:
+        """A newer release (installed app) or newer commits (a developer copy with git)."""
+        if self.installed:
+            with http_client() as client:
+                return check_release(self.build.version, client)
+        if (self.paths.root / ".git").exists():
+            return check_git(self.paths.root)
+        return Status(error="This copy has no update source (not installed, no git).")
+
+    def _offer(self, status: Status) -> dict[str, Any]:
+        return {"behind": status.behind, "commits": status.commits[:5], "version": status.version}
+
     def _check_update(self, _: dict[str, Any]) -> dict[str, Any]:
-        status = check_update(self.paths.root)
-        self.update_available = ({"behind": status.behind, "commits": status.commits[:5]}
-                                 if status.available else None)  # fmt: skip
+        status = self._check_status()
+        self.update_available = self._offer(status) if status.available else None
         return {**asdict(status), "available": status.available}
 
     def _update(self, _: dict[str, Any]) -> dict[str, Any]:
@@ -900,9 +951,20 @@ class App:
 
         def work() -> None:
             self.echo("Downloading the update from GitHub...")
-            marker = pull(self.paths)
-            self.echo(f"Got {len(marker.commits)} change(s). Restarting Sidekick...")
-            hand_off(self.paths)
+            if self.installed:
+                with http_client() as client:
+                    release = latest_release(client)
+                    if version_key(release.version) <= version_key(self.build.version):
+                        self.notice, self.update_available = "Already up to date.", None
+                        return
+                    installer = download_release(self.paths, release, client)
+                write_marker(marker_file(self.paths), release_marker(self.build.version, release))
+                self.echo(f"Installing Sidekick {release.version}; it reopens by itself...")
+                install_release(installer)
+            else:
+                marker = pull(self.paths)
+                self.echo(f"Got {len(marker.commits)} change(s). Restarting Sidekick...")
+                hand_off(self.paths)
             if self.bridge is not None:
                 self.bridge.close()
 
@@ -910,14 +972,14 @@ class App:
 
     def _shortcut(self, _: dict[str, Any]) -> dict[str, Any]:
         try:
-            made = shortcut.create(self.paths.root)
+            made = shortcut.create(self.paths.user)
         except shortcut.ShortcutError as exc:
             return {"error": str(exc)}
         return {"ok": True, "made": [str(p) for p in made]}
 
     def _open_folder(self, payload: dict[str, Any]) -> dict[str, Any]:
         targets = {"reports": self._reports(), "log": self.log.path.parent,
-                   "research": self.paths.root / "research"}  # fmt: skip
+                   "folder": self.paths.user, "research": self.paths.research_dir}  # fmt: skip
         target = targets.get(str(payload.get("what")))
         if target is None or not hasattr(os, "startfile"):
             return {"error": "Can't open that here."}
