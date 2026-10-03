@@ -16,6 +16,19 @@ Per player (champion and role), against their lane opponent (the enemy with the 
 | roam_takedowns_14 | kills plus assists before 14:00 on enemies outside their lane (laners) |
 | kp_14 | their share of their team's kills before 14:00 (when the team has any) |
 | deaths_14 | deaths before 14:00 |
+| first_blood | 1 if they killed or helped kill in the game's first champion kill |
+| solo_kills_14 | kills before 14:00 with nobody assisting |
+| level2_s | seconds until they reached level 2 |
+| level2_first | 1 if they reached level 2 before their lane opponent, 0 if after (laners) |
+| plates_14 | plates of the enemy turret in their lane destroyed before 14:00 (laners) |
+| gank_10 | 1 if they took part in killing an enemy laner before 10:00 (junglers) |
+| first_gank_s | seconds until that first lane takedown, when there was one (junglers) |
+| dragons_20, grubs_20 | dragons and voidgrubs their team took before 20:00 (junglers) |
+| herald_20 | 1 if their team took the Rift Herald before 20:00 (junglers) |
+| first_dragon | 1 if their team took the game's first dragon (junglers) |
+
+Each player's lane opponent is kept too (`PlayerFigures.opp`), so the figures can be counted per
+matchup as well (scout/data/stats_db.py `measured_matchups`, `MATCHUP_METRICS`).
 
 "The enemy's half" uses no map constants: closer to the enemy team's spawn point than to their
 own, both read from the timeline's first frame. Player identifiers are never read.
@@ -31,7 +44,14 @@ from scout.model.roles import LANE_ROLES, Role
 POSITIONS = {"TOP": Role.TOP, "JUNGLE": Role.JUNGLE, "MIDDLE": Role.MID, "BOTTOM": Role.BOT,
              "UTILITY": Role.SUPPORT}  # fmt: skip
 EARLY_MS = 14 * 60_000
+GANK_MS = 10 * 60_000
+OBJECTIVES_MS = 20 * 60_000
 MIN_GAME_S = 15 * 60  # shorter games (remakes, early surrenders) aren't measured
+LANE_TYPES = {Role.TOP: "TOP_LANE", Role.MID: "MID_LANE", Role.BOT: "BOT_LANE",
+              Role.SUPPORT: "BOT_LANE"}  # Riot's laneType on turret events  # fmt: skip
+# Counted per matchup too (champion vs lane opponent): the lane read's raw material
+MATCHUP_METRICS = ("win", "gold_diff_10", "gold_diff_15", "xp_diff_10", "cs_diff_10",
+                   "push_3_10", "solo_kills_14", "level2_first", "deaths_14")  # fmt: skip
 
 
 @dataclass
@@ -39,6 +59,8 @@ class PlayerFigures:
     champ_id: str
     role: Role
     figures: dict[str, float] = field(default_factory=dict)
+    opp: str = ""  # the lane opponent's champion (same position, other team)
+    team: int = 0  # Riot's team id (100 or 200)
 
 
 def patch_of(match: Mapping[str, Any]) -> str:
@@ -69,8 +91,16 @@ def measure(match: Mapping[str, Any], timeline: Mapping[str, Any], by_key: Mappi
     if spawn is None:
         return []
     events = [e for f in frames for e in f.get("events") or [] if isinstance(e, dict)]
-    kills = [e for e in events if e.get("type") == "CHAMPION_KILL"
-             and int(e.get("timestamp") or 0) < EARLY_MS]  # fmt: skip
+    all_kills = sorted((e for e in events if e.get("type") == "CHAMPION_KILL"),
+                       key=lambda e: int(e.get("timestamp") or 0))  # fmt: skip
+    kills = [e for e in all_kills if int(e.get("timestamp") or 0) < EARLY_MS]
+    first_blood = all_kills[0] if all_kills else None
+    monsters = [e for e in events if e.get("type") == "ELITE_MONSTER_KILL"]
+    plates = [e for e in events if e.get("type") == "TURRET_PLATE_DESTROYED"
+              and int(e.get("timestamp") or 0) < EARLY_MS]  # fmt: skip
+    level2 = {int(e["participantId"]): int(e["timestamp"]) for e in reversed(events)
+              if e.get("type") == "LEVEL_UP" and int(e.get("level") or 0) == 2
+              and isinstance(e.get("participantId"), int)}  # fmt: skip
     out = []
     for pid, (team, role, champ, won) in seats.items():
         f: dict[str, float] = {"win": 1.0 if won else 0.0}
@@ -112,8 +142,50 @@ def measure(match: Mapping[str, Any], timeline: Mapping[str, Any], by_key: Mappi
             f["roam_takedowns_14"] = sum(
                 1 for e in mine_tk if seats.get(e.get("victimId"), (0, None))[1] not in home
             )
-        out.append(PlayerFigures(champ, role, f))
+        if first_blood is not None:
+            f["first_blood"] = 1.0 if _took_part(first_blood, pid) else 0.0
+        f["solo_kills_14"] = sum(1 for e in kills if e.get("killerId") == pid
+                                 and not e.get("assistingParticipantIds"))  # fmt: skip
+        if pid in level2:
+            f["level2_s"] = level2[pid] / 1000
+        if role is Role.JUNGLE:
+            f.update(_jungle(pid, team, seats, all_kills, monsters))
+        else:
+            if pid in level2 and opp in level2 and level2[pid] != level2[opp]:
+                f["level2_first"] = 1.0 if level2[pid] < level2[opp] else 0.0
+            f["plates_14"] = sum(1 for e in plates if e.get("teamId") == enemy_team
+                                 and e.get("laneType") == LANE_TYPES[role])  # fmt: skip
+        out.append(PlayerFigures(champ, role, f, seats[opp][2] if opp is not None else "", team))
     return out
+
+
+def _took_part(kill: Mapping[str, Any], pid: int) -> bool:
+    return kill.get("killerId") == pid or pid in (kill.get("assistingParticipantIds") or [])
+
+
+def _jungle(pid: int, team: int, seats: Mapping[int, tuple[int, Role, str, bool]],
+            kills: Sequence[Mapping[str, Any]],
+            monsters: Sequence[Mapping[str, Any]]) -> dict[str, float]:  # fmt: skip
+    """A jungler's first gank and their team's early objectives."""
+    f: dict[str, float] = {}
+    gank = next((e for e in kills if int(e.get("timestamp") or 0) < GANK_MS
+                 and _took_part(e, pid)
+                 and seats.get(e.get("victimId"), (team, Role.JUNGLE))[0] != team
+                 and seats.get(e.get("victimId"), (team, Role.JUNGLE))[1] is not Role.JUNGLE),
+                None)  # fmt: skip
+    f["gank_10"] = 1.0 if gank is not None else 0.0
+    if gank is not None:
+        f["first_gank_s"] = int(gank.get("timestamp") or 0) / 1000
+    early = [e for e in monsters if int(e.get("timestamp") or 0) < OBJECTIVES_MS
+             and e.get("killerTeamId") == team]  # fmt: skip
+    f["dragons_20"] = sum(1 for e in early if e.get("monsterType") == "DRAGON")
+    f["grubs_20"] = sum(1 for e in early if e.get("monsterType") == "HORDE")
+    f["herald_20"] = 1.0 if any(e.get("monsterType") == "RIFTHERALD" for e in early) else 0.0
+    dragons = sorted((e for e in monsters if e.get("monsterType") == "DRAGON"),
+                     key=lambda e: int(e.get("timestamp") or 0))  # fmt: skip
+    if dragons:
+        f["first_dragon"] = 1.0 if dragons[0].get("killerTeamId") == team else 0.0
+    return f
 
 
 def _pf(frame: Mapping[str, Any], pid: int) -> Mapping[str, Any]:

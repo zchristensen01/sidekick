@@ -160,4 +160,11 @@ CREATE TABLE IF NOT EXISTS collector_state (key TEXT PRIMARY KEY, value TEXT NOT
 CREATE TABLE IF NOT EXISTS games (
     game_hash TEXT PRIMARY KEY, patch TEXT NOT NULL, record TEXT NOT NULL
 );
+-- The same totals per matchup: a champion against its lane opponent in a role (a few metrics,
+-- scout/data/measure.py MATCHUP_METRICS). docs/MATCH_DATA.md.
+CREATE TABLE IF NOT EXISTS measured_matchups (
+    patch TEXT NOT NULL, champ_id TEXT NOT NULL, role TEXT NOT NULL, opp_champ_id TEXT NOT NULL,
+    metric TEXT NOT NULL, n INTEGER NOT NULL, total REAL NOT NULL, total_sq REAL NOT NULL,
+    PRIMARY KEY (patch, champ_id, role, opp_champ_id, metric)
+);
 """

@@ -329,14 +329,14 @@ def refresh(
         service.close()
     if lines:
         log_entry(paths, f"{started:%Y-%m-%d %H:%M} stats", lines)
-    try:  # M20: each call's track record, from the games collected so far (offline)
-        checked = _backtest(paths, config, version, tables)
-        if checked is not None:
-            typer.echo(f"Backtest: {checked.games:,} stored games checked "
-                       "(`scout backtest` shows the results).")  # fmt: skip
-    except (ValueError, OSError) as exc:
-        typer.echo(f"Backtest skipped: {exc}", err=True)
-    if config.report.research_reminders:  # the PC that does the research (the owner's)
+    if config.owner:  # the owner's PC: the backtest and the research (docs/MATCH_DATA.md)
+        try:  # M20: each call's track record, from the games collected so far (offline)
+            checked = _backtest(paths, config, version, tables)
+            if checked is not None:
+                typer.echo(f"Backtest: {checked.games:,} stored games checked "
+                           "(`scout backtest` shows the results).")  # fmt: skip
+        except (ValueError, OSError) as exc:
+            typer.echo(f"Backtest skipped: {exc}", err=True)
         _research_upkeep(paths, version)
     if failed:
         raise typer.Exit(code=1)
@@ -777,9 +777,10 @@ def collect(
         bool, typer.Option("--status", help="Only show coverage and the OP.GG cross-check.")
     ] = False,
 ) -> None:
-    """Measure Emerald+ ranked games from Riot's match data (needs the Riot key)."""
+    """Measure Emerald+ ranked games from Riot's match data (the owner's PC; needs the Riot
+    key). Stops at the patch's target (docs/MATCH_DATA.md)."""
     from scout.analysis.measured import changes, coverage, cross_check
-    from scout.data.collector import Collector
+    from scout.data.collector import PATCH_TARGET, Collector, left_this_patch
     from scout.data.measure import finished_items
     from scout.data.patch import previous_patch, short_patch
 
@@ -790,6 +791,10 @@ def collect(
     patch = short_patch(version)
     try:
         if not status:
+            if not config.owner:
+                typer.echo("Match data is collected only on the owner's PC (`owner: true` in "
+                           "config.yaml; docs/MATCH_DATA.md).", err=True)  # fmt: skip
+                raise typer.Exit(code=1)
             if not config.secrets.riot_api_key:
                 typer.echo("No Riot API key: paste one in the app's Settings.", err=True)
                 raise typer.Exit(code=1)
@@ -800,7 +805,8 @@ def collect(
             previous = previous_patch(patch)
             collector = Collector(riot, db, by_key, finished_items(tables["items.csv"]),
                                   (patch, previous))  # fmt: skip
-            typer.echo(f"Measuring up to {games} games from patches {patch} and {previous} "
+            wanted = min(games, left_this_patch(db, patch))
+            typer.echo(f"Measuring up to {wanted} games from patches {patch} and {previous} "
                        "(about 45 games every 2 minutes; Ctrl+C stops safely)...")  # fmt: skip
             try:
                 typer.echo(collector.run(games).line())
@@ -809,8 +815,11 @@ def collect(
         table = db.measured(patch)
         shares = _role_rates(db)
         have, wanted, missing = coverage(table, shares)
-        typer.echo(f"Patch {patch}: {db.collected_games(patch)} games counted; {have} of "
-                   f"{wanted} champion-roles really played have 50+ games.")  # fmt: skip
+        typer.echo(f"Patch {patch}: {db.collected_games(patch):,} of {PATCH_TARGET:,} games "
+                   f"counted; {have} of {wanted} champion-roles really played have 50+ "
+                   "games.")  # fmt: skip
+        pairs = db.measured_matchups(patch, min_games=20)
+        typer.echo(f"  Matchups (champion vs lane opponent) with 20+ games: {len(pairs)}")
         if missing and have:
             typer.echo(f"  Still thin: {', '.join(missing[:12])}"
                        + (f" and {len(missing) - 12} more" if len(missing) > 12 else ""))
@@ -864,7 +873,7 @@ def import_research(
 @app.command()
 def research() -> None:
     """Rewrite the prompts in research/ for the current patch and what's due (the app does it
-    by itself on the PC with research reminders on)."""
+    by itself on the owner's PC)."""
     from scout.research import regenerate
 
     paths = Paths.from_env()

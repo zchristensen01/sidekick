@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from scout.data.measure import MATCHUP_METRICS
 from scout.data.opgg import SOURCE, Guide, LaneRow, SynergyRow
 from scout.data.schemas import STATS_DB_SCHEMA
 from scout.model.roles import Role
@@ -359,6 +360,9 @@ class StatsDb:
         was already counted)."""
         rows = [(patch, p.champ_id, p.role.value, metric, value, value * value)
                 for p in players for metric, value in p.figures.items()]  # fmt: skip
+        pairs = [(patch, p.champ_id, p.role.value, p.opp, metric, value, value * value)
+                 for p in players if getattr(p, "opp", "")
+                 for metric, value in p.figures.items() if metric in MATCHUP_METRICS]  # fmt: skip
         with self._lock, self._db:
             done = self._db.execute(
                 "INSERT OR IGNORE INTO collected VALUES (?,?,?)", (game_hash, patch, at)
@@ -370,6 +374,12 @@ class StatsDb:
                 "(patch, champ_id, role, metric) DO UPDATE SET n = n + 1, "
                 "total = total + excluded.total, total_sq = total_sq + excluded.total_sq",
                 rows,
+            )
+            self._db.executemany(
+                "INSERT INTO measured_matchups VALUES (?,?,?,?,?,1,?,?) ON CONFLICT"
+                "(patch, champ_id, role, opp_champ_id, metric) DO UPDATE SET n = n + 1, "
+                "total = total + excluded.total, total_sq = total_sq + excluded.total_sq",
+                pairs,
             )
             if record is not None:
                 self._db.execute("INSERT OR IGNORE INTO games VALUES (?,?,?)",
@@ -385,6 +395,39 @@ class StatsDb:
             args = tuple(patches)
         sql += " ORDER BY rowid DESC" + (f" LIMIT {int(limit)}" if limit else "")
         return [{**json.loads(record), "patch": patch} for patch, record in self._read(sql, args)]
+
+    def measured_matchups(
+        self, patch: str, min_games: int = 1
+    ) -> dict[tuple[str, Role, str], dict[str, tuple[int, float, float]]]:
+        """(champ, role, opp) -> metric -> (games, mean, standard deviation), for matchups with
+        at least `min_games` games."""
+        out: dict[tuple[str, Role, str], dict[str, tuple[int, float, float]]] = {}
+        for champ, role, opp, metric, n, total, total_sq in self._read(
+            "SELECT champ_id, role, opp_champ_id, metric, n, total, total_sq FROM "
+            "measured_matchups WHERE patch=? AND n>=?", (patch, min_games),
+        ):  # fmt: skip
+            mean = total / n
+            spread = max(0.0, total_sq / n - mean * mean) ** 0.5
+            out.setdefault((champ, Role(role), opp), {})[metric] = (int(n), mean, spread)
+        return out
+
+    def prune(self, keep: Sequence[str], seen_before: str) -> dict[str, int]:
+        """Drop measured data for patches other than `keep` (the current and previous one), and
+        the "already counted" marks older than `seen_before` (an ISO time: past the
+        collector's look-back, those games can't come up again). Returns rows deleted."""
+        if not keep:
+            return {}
+        marks = ",".join("?" * len(keep))
+        done: dict[str, int] = {}
+        with self._lock, self._db:
+            for table in ("measured", "measured_matchups", "games"):
+                cur = self._db.execute(f"DELETE FROM {table} WHERE patch NOT IN ({marks})",
+                                       tuple(keep))  # fmt: skip
+                done[table] = cur.rowcount
+            cur = self._db.execute(f"DELETE FROM collected WHERE patch NOT IN ({marks}) "
+                                   "AND collected_at < ?", (*keep, seen_before))  # fmt: skip
+            done["collected"] = cur.rowcount
+        return done
 
     def seen(self, game_hash: str) -> bool:
         return bool(self._read("SELECT 1 FROM collected WHERE game_hash=?", (game_hash,)))

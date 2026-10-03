@@ -205,7 +205,7 @@ class GameState:
 | Collector | every 30 s, only while idle | measures new Emerald+ games with its own share of the Riot key's rate limit (M19) |
 | Update check | 20 s after start, then every 6 hours, only while idle | `git fetch`; "Update available" in the top bar (M21) |
 | Data refresh | checks every 5 minutes; runs when the last one is 6+ hours old and you're idle | `scout refresh --pool` in a hidden child process (M21); on the research PC it also checks the wiki for hotfixes and rewrites the research prompts |
-| Research due | worked out each minute | `research/status.csv` against the current patch; shown if research reminders are on |
+| Research due | worked out each minute | `research/status.csv` against the current patch; shown on the owner's PC (`owner: true`) |
 
 "Idle" means the client isn't in champ select, the loading screen or a game (`Watcher.idle`,
 even for a game Sidekick isn't following), and for the collector and the refresh, no other job

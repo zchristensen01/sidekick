@@ -67,7 +67,6 @@ class ReportConfig:
     fetch_budget_seconds: float
     save_dir: str
     player_records: bool = True  # loading screen: players' OP.GG records (M16, POLICY.md)
-    research_reminders: bool = False  # the top bar's "Research due": for whoever runs research
 
 
 @dataclass(frozen=True)
@@ -101,6 +100,9 @@ class Config:
     llm: LlmConfig
     secrets: Secrets
     source: Path
+    # The owner's PC (whoever maintains Sidekick): collects Riot match data, runs the backtest,
+    # shows research reminders. Everyone else: False, and those parts are hidden.
+    owner: bool = False
 
 
 def load_config(path: Path, env_path: Path | None = None) -> Config:
@@ -129,6 +131,7 @@ def load_config(path: Path, env_path: Path | None = None) -> Config:
         llm=_llm(_section(raw, "llm")),
         secrets=load_secrets(env_path),
         source=path,
+        owner=_flag(raw, "owner", "config", default=False),
     )  # fmt: skip
     return config
 
@@ -214,7 +217,6 @@ def _report(d: dict[str, Any]) -> ReportConfig:
         fetch_budget_seconds=_number(d, "fetch_budget_seconds", s, low=0, high=60),
         save_dir=_text(d, "save_dir", s),
         player_records=_flag(d, "player_records", s, default=True),
-        research_reminders=_flag(d, "research_reminders", s, default=False),
     )
 
 

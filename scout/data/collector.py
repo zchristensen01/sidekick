@@ -7,8 +7,11 @@ and previous patch are kept. Player ids are used in memory to list games and the
 games are remembered by a one-way hash, so nothing stored points back to a player or a game.
 
 Riot's personal-key limit (100 calls per 2 minutes) allows about 45 games every 2 minutes;
-`scout collect` runs it by hand, and the app runs it in the background while you're not in a
-game (it pauses for champ select so the loading-screen checks get the key's calls).
+`scout collect` runs it by hand, and the owner's app runs it in the background while they're
+not in a game (it pauses for champ select so the loading-screen checks get the key's calls).
+
+It stops at PATCH_TARGET games for the current patch and starts again with the next patch, and
+each run first drops older patches' data (docs/MATCH_DATA.md).
 """
 
 import hashlib
@@ -16,7 +19,7 @@ import json
 import random
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from scout.data.measure import POSITIONS, measure, patch_of
@@ -34,6 +37,8 @@ GAMES_PER_PLAYER = 3
 COLLECTOR_LIMITS = ((15, 1.0), (80, 120.0))
 LOOKBACK_DAYS = 14  # a patch lasts about two weeks
 MAX_PAGE = 20  # wrap to page 1 after this many pages of a division
+PATCH_TARGET = 4000  # games per patch: then the figures barely move, and collecting pauses
+SEEN_DAYS = 30  # "already counted" marks are kept this long (past the look-back, then dropped)
 
 
 @dataclass
@@ -44,10 +49,16 @@ class Summary:
     players: int = 0
     error: str = ""
     by_patch: dict[str, int] = field(default_factory=dict)
+    full: str = ""  # the patch that already has PATCH_TARGET games (nothing to do)
 
     def line(self) -> str:
+        if self.full and not self.added:
+            return (f"Patch {self.full} has its {PATCH_TARGET:,} games: collecting starts again "
+                    "with the next patch.")  # fmt: skip
         text = f"{self.added} new games measured ({self.players} players' recent games checked"
         text += f", {self.seen} already counted, {self.old_patch} from older patches)"
+        if self.full:
+            text += f"; patch {self.full} now has its {PATCH_TARGET:,} games"
         if self.error:
             text += f"; stopped: {self.error}"
         return text + "."
@@ -79,6 +90,11 @@ def backtest_record(match: Mapping[str, Any], timeline: Mapping[str, Any],
     return {"sides": sides, "version": str((match.get("info") or {}).get("gameVersion") or "")}
 
 
+def left_this_patch(db: StatsDb, patch: str) -> int:
+    """Games still wanted for this patch (0 once it has PATCH_TARGET)."""
+    return max(0, PATCH_TARGET - db.collected_games(patch))
+
+
 class Collector:
     def __init__(self, riot: object, db: StatsDb, by_key: Mapping[int, str],
                  finished_items: frozenset[int], patches: Sequence[str],
@@ -87,19 +103,33 @@ class Collector:
         self.riot, self.db, self.by_key = riot, db, by_key
         self.finished, self.patches = finished_items, tuple(patches)
         self.now, self.shuffle = now, shuffle
+        self.tier = ""  # the ladder tier of the page being walked, kept with each game record
 
     def run(self, games: int, stop: Callable[[], bool] = lambda: False) -> Summary:
-        """Measure up to `games` new games. Never raises: a Riot error ends the run."""
+        """Measure up to `games` new games, never more than the current patch still wants.
+        Drops older patches' data first. Never raises: a Riot error ends the run."""
         summary = Summary()
-        since = int(self.now().timestamp()) - LOOKBACK_DAYS * 86_400
+        now = self.now()
+        since = int(now.timestamp()) - LOOKBACK_DAYS * 86_400
+        self.db.prune(self.patches, (now - timedelta(days=SEEN_DAYS)).isoformat(timespec="seconds"))
+        current = self.patches[0] if self.patches else ""
+
+        def full() -> bool:
+            if current and left_this_patch(self.db, current) == 0:
+                summary.full = current
+                return True
+            return False
+
+        if full():
+            return summary
         try:
-            while summary.added < games and not stop():
+            while summary.added < games and not stop() and not full():
                 players = self._next_page()
                 if not players:
                     continue
                 self.shuffle(players)
                 for puuid in players:
-                    if summary.added >= games or stop():
+                    if summary.added >= games or stop() or full():
                         break
                     summary.players += 1
                     for match_id in self.riot.solo_ids(puuid, GAMES_PER_PLAYER, since):
@@ -124,8 +154,10 @@ class Collector:
             return
         timeline = self.riot.timeline(match_id)
         players = measure(match, timeline, self.by_key, self.finished)
-        if players and self.db.add_game(key, patch, players, stamp,
-                                        backtest_record(match, timeline, self.by_key)):
+        record = backtest_record(match, timeline, self.by_key)
+        if record is not None and self.tier:
+            record["tier"] = self.tier  # the ladder tier the game was found through
+        if players and self.db.add_game(key, patch, players, stamp, record):
             summary.added += 1
             summary.by_patch[patch] = summary.by_patch.get(patch, 0) + 1
         elif not players:
@@ -137,6 +169,7 @@ class Collector:
         cursor = json.loads(raw) if raw else {"step": 0, "pages": {}}
         step = cursor["step"] % len(LADDER)
         tier, division = LADDER[step]
+        self.tier = tier
         name = f"{tier}-{division}"
         page = int(cursor["pages"].get(name, 0)) % MAX_PAGE + 1
         players = self.riot.ladder(tier, division, page)

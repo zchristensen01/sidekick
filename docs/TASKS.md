@@ -352,7 +352,8 @@ labelled.
       champion data, OP.GG's numbers, matchup tables, the backtest), never during champ select
       or a game, and says so only for a new patch (2026-10-03: "is everything else
       automatically updated?"); the Windows scheduled task is now optional
-- [x] Research reminders are a Settings switch (on for the owner, off for new installs): only the
+- [x] Research reminders are on the owner's PC only (`owner: true`, 2026-10-03; it was a Settings
+      switch before): only the
       person who runs the research sees "Research due"; it goes away as soon as results are
       applied, and for everyone else once the owner's commit reaches them
 - [x] Research results for 26.19 applied (17 kit changes to the review queue, 16 class
@@ -376,6 +377,27 @@ labelled.
 - [ ] Matchup notes per person: `data/manual/matchup_notes.csv` is shared through git, so the owner's
       notes would show as a friend's "Your notes" (empty so far; part of the privacy work another
       agent is doing)
+
+## Collected match data, the owner's PC only (2026-10-03; docs/MATCH_DATA.md)
+- [x] `owner: true` in config.yaml marks the owner's PC: only it collects Riot match data, runs
+      the backtest in each refresh and gets research reminders; everyone else (`owner: false`,
+      the default) doesn't, and Settings hides "Match data" and "Research results" for them
+      (the research reminder switch is gone: the owner gets them). `scout collect` refuses on
+      other PCs. What the games teach reaches everyone through the code
+- [x] Collecting stops at 4,000 games per patch (`PATCH_TARGET`) and starts again with the next
+      patch; `scout collect --status` shows games against the target
+- [x] Each collecting run first drops older patches' totals, matchups and records (the current
+      and previous patch stay), and "already counted" marks after 30 days: about 15 MB at most
+- [x] More from each game: first blood, solo kills, the level 2 time and race, plates in the
+      lane; for junglers the first gank (whether and when), dragons, voidgrubs and Herald by
+      20:00 and the first dragon; every figure's lane opponent, with totals per matchup
+      (`measured_matchups`: win, gold/XP/CS at 10, gold at 15, lane push, solo kills, the level 2
+      race, early deaths); each game record keeps the ladder tier it came from
+- [x] Each game played with the app (with a Riot key) is kept for a later review:
+      `reports/<report>.review.json` (every player's figures, what happened, each call's result)
+- [ ] Use the matchup totals in the lane read once common matchups have enough games (with M20's
+      fitting)
+- [ ] Future project: the post-game review against the plan (`docs/future/postgame-review/`)
 
 ## One report per game (2026-10-03: "never the free draft read; straight from champ select to the LLM report")
 - [x] No report when picks lock: the app shows "Picks locked, your report comes at the loading

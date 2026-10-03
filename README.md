@@ -39,8 +39,8 @@ Everything else is in **Settings** (top right):
   rate, average K/D/A; never names), on or off (`docs/POLICY.md`).
 - **AI report writer**: on or off, today's cost, and the Anthropic key.
 - **Data and updates**: refresh the data, **Check for updates** (gets the newest version from
-  GitHub, restarts, refreshes the data), the match data collector, research (reminders, the
-  research folder, applying results), shortcuts, and the reports and log folders.
+  GitHub, restarts, refreshes the data), shortcuts, and the reports and log folders; on the
+  owner's PC also the match data collector and research (`docs/MATCH_DATA.md`).
 
 **It keeps itself current** while it's open: it checks GitHub for a new version at start and
 every 6 hours ("Update available" in the top bar), refreshes its data every 6 hours (a new
@@ -144,7 +144,8 @@ What they get, and what's shared:
   `reports/`, `data/generated/`, `data/history/` stay out of git), so they start clean.
 - Everything in `data/manual/` (game facts, class definitions, champion notes, matchup briefs)
   and the research results come with each update. Research is the owner's job: their app has
-  research reminders off, so "Research due" never shows for them.
+  `owner: false` (the default), so research and match data collection stay hidden for them
+  (`docs/MATCH_DATA.md`).
 - Without keys: pick options, OP.GG's numbers and the report's rules version. With
   their own Riot key: measured match data on their PC, the post-game check, one-tricks. With
   their own Anthropic key: the written report (about 1 cent a game).

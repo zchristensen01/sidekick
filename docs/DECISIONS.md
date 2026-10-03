@@ -18,6 +18,23 @@ one, add a new entry that supersedes it rather than editing the old one.
 112. **A person's own trait edit is `source=owner`** (it carried the owner's name before):
      `scout review` marks an edited row this way, and such a row still beats every source.
 
+## 2026-10-03: collected match data (docs/MATCH_DATA.md)
+121. **Only the owner's PC collects games** (`owner: true` in config.yaml, local, never in git;
+     not tied to a Riot account, whose id can't go in the code): it also runs the backtest and
+     gets research reminders. What the games teach goes into the code for everyone; a friend's
+     PC collecting would spend their key to relearn the same. Their reports lack only the
+     per-champion measured figures.
+122. **4,000 games per patch, then pause; keep two patches.** Past that the common champions'
+     figures barely move, and two patches are all the reports and the backtest use. Old marks
+     go after 30 days, past the 14-day look-back.
+123. **Everything useful from each game we already download**: early-game events from the
+     timeline (first blood, solo kills, the level 2 race, plates, the first gank, objectives by
+     20:00) and totals per matchup, so the lane read can later use the matchup itself. Nothing
+     OP.GG already gives (win rates, builds, runes).
+124. **Own games are kept for a review, not reviewed yet** (the owner: a later project): each
+     game's figures, outcome and calls go in `reports/<report>.review.json`, next to the plan;
+     docs/future/postgame-review/ has what the review should do and what the LLM should get.
+
 ## 2026-10-03: one report per game
 120. **No draft read; the one report comes at the loading screen, written by the LLM** (the owner:
      "never the free draft read; straight from champ select to the LLM report"; updates #60).

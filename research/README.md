@@ -15,7 +15,7 @@ itself, every source, the patch checklist): `docs/PATCH_UPDATE.md`.
 
 `status.csv` records which prompt was done for which patch (Data Dragon's patch number: 16.19
 is Riot's 26.19). After a new patch the app's top bar shows "Research due" until both per-patch
-prompts are applied, for whoever has research reminders on (Settings, Data and updates; only the
+prompts are applied, on the owner's PC (`owner: true` in config.yaml; only the
 person who runs the research needs them). Everyone else gets the results with the next update.
 
 ## How to run one
@@ -34,7 +34,7 @@ person who runs the research needs them). Everyone else gets the results with th
    record of where each fact came from.
 5. Claude Code commits `data/manual/`, `status.csv` and `results/done/`, and pushes.
 
-`scout research` rewrites them by hand; the app does it on the PC with research reminders on.
+`scout research` rewrites them by hand; the app does it on the owner's PC.
 Claude Code commits the rewritten prompts with the results.
 
 ## Known gaps

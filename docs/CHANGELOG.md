@@ -2,6 +2,13 @@
 
 One line per finished task or fix: date, what changed, why.
 
+- 2026-10-03: Collected match data, the owner's PC only (docs/MATCH_DATA.md): `owner: true` in
+  config.yaml marks it; only it collects games, runs the backtest and gets research reminders,
+  and Settings hides those parts elsewhere. Collecting stops at 4,000 games per patch and older
+  patches are dropped (about 15 MB at most). Each game gives more: first blood, solo kills, the
+  level 2 race, plates, the jungler's first gank and objectives by 20:00, and totals per matchup.
+  Each own game is kept next to its report for a future post-game review
+  (docs/future/postgame-review/).
 - 2026-10-03: M25, nothing personal in git: the repo starts over with one clean commit (private
   noreply author); the test games, sample champ select sessions, post-game match and OP.GG
   profile are made up; the owner's name, user folder and time zone are gone from every file;

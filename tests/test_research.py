@@ -122,8 +122,11 @@ def test_the_app_shows_whats_due(scout_home):
     assert meta["research"]["prompts"] == ["patch_notes", "game_facts", "class_definitions"]
     assert meta["research"]["remind"] is False  # a new install: the top bar stays quiet
     assert meta["update"] is None  # nothing checked yet
-    assert app.action("set_research_reminders", {"on": True}) == {"ok": True}
-    assert app.meta()["research"]["remind"] is True  # the PC that runs the research
+    config = scout_home.config_file
+    config.write_text(config.read_text(encoding="utf-8").replace("owner: false", "owner: true"),
+                      encoding="utf-8")  # fmt: skip
+    app._due_at = 0.0  # worked out again (once a minute)
+    assert app.meta()["research"]["remind"] is True  # the owner's PC, which runs the research
 
 
 def test_the_app_refreshes_its_data_every_6_hours(scout_home):

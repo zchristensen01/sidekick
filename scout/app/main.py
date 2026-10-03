@@ -210,7 +210,7 @@ class App:
 
     def research_due(self) -> dict[str, Any]:
         """Prompts in research/ to run for the current patch (M21), worked out once a minute.
-        `remind`: whether the top bar shows it (Settings; only whoever runs the research)."""
+        `remind`: whether the top bar shows it (only on the owner's PC)."""
         if not self.can_research:
             return {}
         now = time.monotonic()
@@ -218,7 +218,7 @@ class App:
             self._due_at = now
             version = current_version(self.paths)
             try:
-                remind = self._config().report.research_reminders
+                remind = self._config().owner
             except ConfigError:
                 remind = False
             if version:
@@ -278,8 +278,8 @@ class App:
                 config = self._config()
             except ConfigError:
                 continue
-            if not config.stats.collect or not config.secrets.riot_api_key:
-                continue
+            if not (config.owner and config.stats.collect and config.secrets.riot_api_key):
+                continue  # the owner's PC only (docs/MATCH_DATA.md)
             tables = load_static(self.paths, session.version)
             riot = RiotApi(config.secrets.riot_api_key, config.player.platform,
                            config.player.regional_route, max_wait_s=130,
@@ -477,7 +477,6 @@ class App:
             "save_account": self._save_account,
             "set_llm": self._set_llm, "save_key": self._save_key, "refresh": self._refresh,
             "set_players": self._set_players, "set_collect": self._set_collect,
-            "set_research_reminders": self._set_research_reminders,
             "history": self._history, "history_game": self._history_game,
             "research_plan": self._research_plan, "research_apply": self._research_apply,
             "check_update": self._check_update, "update": self._update,
@@ -529,6 +528,7 @@ class App:
             "app": {"commit": self._version_text(), "patch": current_version(self.paths) or "",
                     "data_at": self._data_time(), "shortcut": shortcut.exists(),
                     "installed": self.installed, "can_research": self.can_research,
+                    "owner": bool(config and config.owner),
                     "folder": str(self.paths.user),
                     "in_game": session is not None and not session.watcher.idle()},
             "account": {"logged_in": account.riot_id if account else "", "live": live,
@@ -768,7 +768,7 @@ class App:
 
     def _collect_status(self, config: Config | None) -> dict[str, Any]:
         """Games measured this patch, coverage, and the cross-check with OP.GG."""
-        on = bool(config and config.stats.collect)
+        on = bool(config and config.owner and config.stats.collect)
         session = self.session
         if session is None:  # not connected yet: the count straight from the database
             version = current_version(self.paths)
@@ -812,7 +812,7 @@ class App:
             return {"ok": True, "done": ["Nothing to change."]}
         version = current_version(self.paths) or ""
         done = research_import.apply(self.paths, found, short_patch(version) if version else "")
-        if self._config().report.research_reminders:
+        if self._config().owner:
             regenerate_prompts(self.paths)  # the prompts follow what's due now
         self._due_at = 0.0  # recheck what's due
         self.reload_when_idle()  # new game facts and class definitions: next game
@@ -835,13 +835,6 @@ class App:
         found = past.game(self._reports(), self.paths.history_dir / "postgame.csv",
                           str(payload.get("id", "")))  # fmt: skip
         return found if found is not None else {"error": "That game isn't saved here."}
-
-    def _set_research_reminders(self, payload: dict[str, Any]) -> dict[str, Any]:
-        on = bool(payload.get("on"))
-        text = self.paths.config_file.read_text(encoding="utf-8")
-        self._write_config(with_value(text, "report", "research_reminders", on, add=True))
-        self._due_at = 0.0
-        return {"ok": True}
 
     def _set_collect(self, payload: dict[str, Any]) -> dict[str, Any]:
         on = bool(payload.get("on"))

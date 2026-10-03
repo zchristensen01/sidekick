@@ -5,8 +5,8 @@ facts that exist as words: a patch's notes, the game facts, Riot's class definit
 The prompts are rewritten from the current data (the champion list, today's game facts, the
 patch, what research is due) so an agent with web browsing can work from the prompt alone, with
 nothing to fill in; each prompt ends with exactly what to send back. `regenerate` runs after
-each data refresh and each applied research reply on the PC that does the research (research
-reminders on), and with `scout research`. A mid-patch hotfix turns the patch notes prompt into
+each data refresh and each applied research reply on the owner's PC (`owner: true`), and with
+`scout research`. A mid-patch hotfix turns the patch notes prompt into
 one about that update only (scout/data/patch_updates.py).
 """
 
@@ -302,7 +302,7 @@ itself, every source, the patch checklist): `docs/PATCH_UPDATE.md`.
 
 `status.csv` records which prompt was done for which patch (Data Dragon's patch number: 16.19
 is Riot's 26.19). After a new patch the app's top bar shows "Research due" until both per-patch
-prompts are applied, for whoever has research reminders on (Settings, Data and updates; only the
+prompts are applied, on the owner's PC (`owner: true` in config.yaml; only the
 person who runs the research needs them). Everyone else gets the results with the next update.
 
 ## How to run one
@@ -321,7 +321,7 @@ person who runs the research needs them). Everyone else gets the results with th
    record of where each fact came from.
 5. Claude Code commits `data/manual/`, `status.csv` and `results/done/`, and pushes.
 
-`scout research` rewrites them by hand; the app does it on the PC with research reminders on.
+`scout research` rewrites them by hand; the app does it on the owner's PC.
 Claude Code commits the rewritten prompts with the results.
 
 ## Known gaps

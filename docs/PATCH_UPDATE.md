@@ -14,8 +14,8 @@ can follow it top to bottom.
   version of Sidekick at start and every 6 hours. Nobody needs the command line for any of it.
 - **Research prompts** cover what only exists as words on a page (which kits a patch changed,
   objective timers, role quests, Riot's class descriptions). After a new patch, or a mid-patch
-  hotfix, the top bar shows "Research due" for whoever has research reminders on (Settings,
-  Data and updates; on for the owner, off for everyone else). The prompts write themselves for what's
+  hotfix, the top bar shows "Research due" on the owner's PC (`owner: true` in config.yaml;
+  everyone else has `owner: false` and never sees it). The prompts write themselves for what's
   due (the patch filled in; after a hotfix, only that update), so they're sent as they are.
   The owner runs them, applies the results, and commits; everyone else gets them with the next
   update.
@@ -33,8 +33,8 @@ can follow it top to bottom.
 | Measured match data (Riot's Emerald+ games) | continuously while the app is idle (about 35 games every 2 minutes); pauses in champ select, at the loading screen, in games, and while a refresh or update runs | needs a Riot key; a new patch starts fresh, last patch's figures stand in until 50 games |
 | "Changed since last patch" flags | as the measured data comes in | a figure must move by more than 3 standard errors, with 50+ games on both patches |
 | The backtest (each call's track record) | each refresh | offline; `scout backtest --fetch` also gets OP.GG's numbers the stored games need |
-| Mid-patch updates (hotfixes) | each refresh, on the PC with research reminders on | read from the LoL Wiki's page for the patch (V26.19); a new one makes the patch notes research due again |
-| The research prompts | each refresh and each applied reply, on the PC with research reminders on | rewritten for what's due now, only when their text changes |
+| Mid-patch updates (hotfixes) | each refresh, on the owner's PC | read from the LoL Wiki's page for the patch (V26.19); a new one makes the patch notes research due again |
+| The research prompts | each refresh and each applied reply, on the owner's PC | rewritten for what's due now, only when their text changes |
 | Research due | worked out every minute | goes away as soon as the results are applied, and for everyone once the owner's commit reaches them |
 | The review queue | each refresh and each game | `data/generated/review_queue.csv` |
 
@@ -60,8 +60,8 @@ Optional, for when the app is closed: a Windows scheduled task running `scout re
 - **Mid-patch hotfixes** (balance changes between patches) don't change Data Dragon's version.
   The LoL Wiki lists them on the patch's page (https://wiki.leagueoflegends.com/en-us/V26.19)
   after the patch's own notes, as "Hotfixes" with dated entries ("May 14th Hotfix") or one-off
-  sections ("October 2nd Queue Update"). Each refresh on the research PC (research reminders
-  on) reads that page's section titles (`data/generated/patch_updates.json`); when the patch
+  sections ("October 2nd Queue Update"). Each refresh on the owner's PC reads that page's
+  section titles (`data/generated/patch_updates.json`); when the patch
   notes research is applied, `research/status.csv` records the updates it covered, and a new
   one makes the patch notes research due again, with a prompt about that update only. The wiki
   lists a hotfix once its editors add it, so it can trail Riot's post; the measured figures

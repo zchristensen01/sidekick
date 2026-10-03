@@ -254,7 +254,7 @@ Modes: `scout refresh` (do whatever is stale), `--static`, `--stats`, `--pool`
    failures, stale datasets. `--prune` drops static and cache folders beyond the last 3 versions.
 9. **Backtest** (M20, offline): grade every call on the stored games and rewrite
    `data/history/backtest.csv`; the writer gets each call's record from it.
-10. **Research upkeep** (M21, only with `report.research_reminders` on): read the section
+10. **Research upkeep** (M21, only on the owner's PC, `owner: true`): read the section
     titles of the LoL Wiki's page for the patch into `patch_updates.json` (mid-patch updates),
     then rewrite the prompts in `research/` whose text changed (`PATCH_UPDATE.md`).
 11. **Never touch `data/manual/`.**

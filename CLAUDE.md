@@ -30,6 +30,8 @@ files stay gitignored).
 | `docs/POLICY.md` | What Riot allows. Read before any feature touching other players or the client |
 | `docs/DECISIONS.md` | Why things are the way they are. Read before changing a design decision |
 | `docs/PATCH_UPDATE.md` | Every data file, its source, how it's refreshed; the new-patch checklist |
+| `docs/MATCH_DATA.md` | The games the owner's PC collects: what's kept, what each gives, when it stops |
+| `docs/future/` | Future projects, each with what it should do (the post-game review) |
 | `research/` | Prompts for facts with no automatic source; results go in `research/results/` |
 | `docs/REQUESTS.md` | Every request the owner has made, with status. Add new requests here first |
 | `docs/TASKS.md` | Ordered milestones. Work top to bottom and tick boxes |

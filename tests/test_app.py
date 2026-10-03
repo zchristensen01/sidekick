@@ -167,8 +167,14 @@ def test_settings_shows_state(app, scout_home):
     assert s["account"]["region"] == "NA"
     assert s["llm"]["on"] is True and s["llm"]["has_key"] is False
     assert s["riot"]["state"] == "none"
-    assert s["collect"]["on"] is True and s["collect"]["games"] == 0
-    assert app.action("set_collect", {"on": False}) == {"ok": True}
+    assert s["app"]["owner"] is False and s["collect"]["on"] is False  # not the owner's PC
+    config = scout_home.config_file
+    config.write_text(config.read_text(encoding="utf-8").replace("owner: false", "owner: true"),
+                      encoding="utf-8")  # fmt: skip
+    owner = app.action("settings", {})
+    assert owner["app"]["owner"] is True and owner["collect"]["on"] is True
+    assert owner["collect"]["games"] == 0
+    assert app.action("set_collect", {"on": False}) == {"ok": True}  # the owner can pause it
     assert app.action("settings", {})["collect"]["on"] is False
     assert app.action("research_plan", {})["empty"] is True
     assert s["app"]["patch"] == "16.19.1"

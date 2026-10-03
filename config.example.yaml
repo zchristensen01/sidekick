@@ -1,6 +1,10 @@
 # Copy to config.yaml (gitignored). Secrets go in .env, not here.
 # Every key is documented here; scout/config.py validates it and explains any mistake.
 
+# Only the owner's PC (the person who maintains Sidekick): collects Riot match data, runs the
+# backtest, shows research reminders. Everyone else leaves it false; those parts are hidden.
+owner: false
+
 player:
   # Who is logged in and your role come from the League client; nothing to type here.
   platform: na1                # Riot API platform routing (na1, euw1, kr, ...); set from the client
@@ -48,9 +52,6 @@ report:
   # showing other players' rank or win rate; it's your call (docs/POLICY.md). false turns it
   # off. Settings in the app has the same switch.
   player_records: true
-  # The top bar's "Research due" button after a new patch. Only the person who runs the prompts
-  # in research/ needs it (the owner); everyone else gets the results with the app's updates.
-  research_reminders: false
 
 llm:
   provider: anthropic          # anthropic | ollama | none (none = deterministic text only)
