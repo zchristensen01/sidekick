@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sidekick</title>
+<style>
+:root {
+  --bg: #0a111c; --panel: #111b2a; --panel2: #16233a; --line: #22324d;
+  --text: #e7eef7; --muted: #8ea1ba; --faint: #5f7390;
+  --gold: #c9a95c; --us: #2bb7a6; --them: #e2625f; --even: #7d8ca3; --warn: #e3b14b;
+  --phys: #e08a5a; --magic: #6a8ff0; --mixed: #b07ae0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 13.5px; line-height: 1.38; overflow: hidden; }
+/* scrollbars in the app's colors (the window is Edge: these are Chromium's scrollbar styles) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line); border: 2px solid transparent; border-radius: 999px;
+  background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: #3a5480; }
+#app { display: flex; flex-direction: column; height: 100vh; }
+.bar { display: flex; align-items: center; gap: 10px; padding: 7px 14px;
+  background: #070d16; border-bottom: 1px solid var(--line); flex: none; }
+.logo { width: 22px; height: 22px; }
+.brand { font-weight: 800; letter-spacing: .14em; color: var(--gold); font-size: 1em; }
+.pill { padding: 2px 10px; border-radius: 999px; font-size: .82em; font-weight: 600;
+  background: var(--panel2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
+.pill.live { color: #071612; background: var(--us); border-color: transparent; }
+.pill.final { color: #1c1404; background: var(--gold); border-color: transparent; }
+.bar .grow { flex: 1; color: var(--muted); font-size: .85em; overflow: hidden;
+  white-space: nowrap; text-overflow: ellipsis; }
+.job { display: none; align-items: center; gap: 6px; color: var(--gold); font-size: .85em; white-space: nowrap; }
+.job.on { display: flex; }
+.alert { border: none; border-radius: 999px; padding: 2px 10px; font-size: .82em; font-weight: 650; cursor: pointer; white-space: nowrap; }
+.alert.update { background: var(--us); color: #071612; }
+.alert.research { background: rgba(201,169,92,.2); color: var(--gold); border: 1px solid rgba(201,169,92,.5); }
+.spin { width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(201,169,92,.25);
+  border-top-color: var(--gold); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg) } }
+button { font: inherit; }
+.btn { background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+  border-radius: 7px; padding: 4px 11px; cursor: pointer; font-size: .9em; }
+.btn:hover { border-color: #3a5480; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.primary { background: var(--gold); color: #1a1405; border-color: transparent; font-weight: 650; }
+.btn.small { padding: 2px 8px; font-size: .82em; }
+.bar .btn { padding: 2px 9px; font-size: .85em; }
+.notice { display: none; align-items: center; gap: 10px; padding: 6px 14px; flex: none;
+  background: rgba(201,169,92,.12); border-bottom: 1px solid rgba(201,169,92,.35); color: #f0dcae; font-size: .9em; }
+.notice.on { display: flex; } .notice span { flex: 1; }
+.notice button { background: none; border: none; color: var(--gold); cursor: pointer; font-size: 1.1em; }
+main { flex: 1; min-height: 0; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 10px; }
+.status { flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; color: var(--muted); text-align: center; padding: 0 40px; }
+.status .big { font-size: 1.9em; color: var(--text); font-weight: 650; }
+.status .hero { width: 72px; height: 72px; opacity: .95; }
+.dot { width: 14px; height: 14px; border-radius: 50%; background: var(--us); animation: pulse 1.6s infinite; }
+.dot.warn { background: var(--them); animation: none; }
+@keyframes pulse { 0% { opacity: .25 } 50% { opacity: 1 } 100% { opacity: .25 } }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: none; }
+.head h1 { margin: 0; font-size: 1.6em; font-weight: 750; }
+.head .vs { color: var(--muted); font-size: .66em; font-weight: 600; }
+.head .tags { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.plan { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 9px;
+  background: linear-gradient(90deg, #1b2a44, #142036); border: 1px solid var(--line); flex: none; }
+.plan .txt { flex: 1; font-size: 1.08em; font-weight: 550; }
+.badge { padding: 3px 10px; border-radius: 6px; font-weight: 700; font-size: .85em; white-space: nowrap; }
+.b-us { background: rgba(43,183,166,.18); color: var(--us); }
+.b-them { background: rgba(226,98,95,.18); color: var(--them); }
+.b-even { background: rgba(125,140,163,.2); color: #b6c3d6; }
+.b-gold { background: rgba(201,169,92,.18); color: var(--gold); }
+.grid { flex: 1; min-height: 0; display: grid; gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; min-height: 0;
+  overflow: auto; }
+.card h2 { margin: 0; font-size: .78em; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.card h2 .sub { color: var(--faint); letter-spacing: 0; text-transform: none; font-weight: 500; }
+ul { margin: 0; padding-left: 16px; } li { margin: 0 0 4px; }
+.small { font-size: .86em; color: var(--muted); }
+li.ai { color: #cdb8f0; font-style: italic; }
+.aitag { font-style: normal; font-size: .72em; padding: 0 5px; border-radius: 4px; background: rgba(176,122,224,.2); color: var(--mixed); margin-right: 3px; }
+.meter { display: grid; grid-template-columns: 92px 1fr 70px; align-items: center; gap: 8px; font-size: .86em; }
+.track { position: relative; height: 10px; border-radius: 5px; background: var(--panel2); }
+.track .mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: var(--faint); }
+.track .fill { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
+.phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.phase { border-radius: 6px; padding: 5px 4px; text-align: center; font-size: .78em; }
+.phase b { display: block; font-size: 1.08em; }
+.p-us { background: rgba(43,183,166,.22); } .p-them { background: rgba(226,98,95,.22); }
+.p-even, .p-unknown { background: var(--panel2); color: var(--muted); }
+.opp { border-left: 3px solid var(--them); padding-left: 9px; }
+.opp .top { display: flex; gap: 9px; align-items: center; }
+.opp .name { font-weight: 700; font-size: 1.05em; }
+.opp .passive b { color: #f1d9a0; }
+.riot { color: var(--faint); font-size: .8em; text-transform: uppercase; letter-spacing: .06em; }
+.lanes { display: grid; gap: 6px; }
+.lrow { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto auto; gap: 8px; align-items: center;
+  background: var(--panel2); border-radius: 8px; padding: 5px 8px; }
+.lrow .mid2 { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lrow .ln { font-weight: 800; color: var(--gold); font-size: .85em; }
+.lrow .faces { display: flex; gap: 2px; align-items: center; }
+.lrow .faces i { color: var(--faint); font-style: normal; font-size: .75em; margin: 0 3px; }
+.lrow .who { font-size: .88em; } .lrow .who span { color: var(--muted); }
+.rank { background: var(--gold); color: #1a1405; border-radius: 6px; padding: 1px 7px; font-weight: 800; font-size: .8em; }
+.gauge { display: flex; align-items: baseline; gap: 8px; }
+.gauge .num { font-size: 2em; font-weight: 750; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { background: var(--panel2); border: 1px solid var(--line); border-radius: 999px; padding: 1px 9px; font-size: .82em; }
+.dmg { display: grid; grid-template-columns: 52px 1fr; gap: 6px; align-items: center; font-size: .85em; }
+.stack { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--panel2); }
+.warn { flex: none; color: var(--muted); font-size: .8em; max-height: 4.6em; overflow: auto; }
+.warn b { color: var(--warn); }
+.picks { display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); flex: none; }
+.pick { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px;
+  display: flex; flex-direction: column; gap: 8px; }
+.pick .top { display: flex; gap: 10px; align-items: center; }
+.pick .nm { font-size: 1.35em; font-weight: 750; }
+.pick .rate { font-size: 1.9em; font-weight: 750; }
+.stars { color: var(--gold); letter-spacing: 1px; font-size: .95em; }
+.stars .off { color: #34465f; }
+.draft { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.slot { display: grid; grid-template-columns: 34px 26px 1fr auto; gap: 8px; padding: 4px 8px;
+  border-radius: 7px; background: var(--panel2); margin-bottom: 4px; align-items: center; }
+.slot.me { outline: 1px solid var(--gold); }
+.slot .r { color: var(--gold); font-weight: 800; font-size: .8em; }
+.empty { color: var(--faint); }
+.plist { flex: none; display: grid; gap: 5px; }
+.prow { display: grid; grid-template-columns: 44px repeat(5, minmax(0, 1fr)); gap: 6px; align-items: stretch; }
+.prow .side { font-weight: 800; font-size: .75em; letter-spacing: .08em; align-self: center; }
+.pchip { display: flex; gap: 7px; align-items: center; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 4px 7px; font-size: .8em; min-width: 0; }
+.pchip.us { border-left: 3px solid var(--us); } .pchip.them { border-left: 3px solid var(--them); }
+.pchip .t { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pchip b { font-size: 1.05em; }
+/* champion pictures */
+.pt { width: 28px; height: 28px; border-radius: 6px; background: var(--panel2); object-fit: cover;
+  flex: none; border: 1px solid var(--line); display: inline-block; vertical-align: middle; }
+.pt.s { width: 22px; height: 22px; border-radius: 5px; }
+.pt.m { width: 36px; height: 36px; border-radius: 8px; }
+.pt.l { width: 46px; height: 46px; border-radius: 10px; border-color: var(--gold); }
+.pt.none { opacity: .35; }
+/* settings */
+#settings, #champs { position: fixed; inset: 0; display: none; background: rgba(4,8,14,.72); z-index: 10; }
+#settings.on, #champs.on { display: flex; align-items: stretch; justify-content: center; padding: 26px; }
+.sheet { position: relative; width: min(1100px, 100%); background: var(--bg); border: 1px solid var(--line); border-radius: 14px;
+  display: grid; grid-template-columns: 200px 1fr; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.close { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 8px; cursor: pointer;
+  border: 1px solid transparent; background: var(--bg); color: var(--muted); font-size: 1.35em; line-height: 1; }
+.close:hover { background: var(--panel2); border-color: var(--line); color: var(--text); }
+.sheet > .close, .sheet3 > .close { position: absolute; top: 12px; right: 18px; z-index: 2; }
+.nav { background: #070d16; border-right: 1px solid var(--line); padding: 14px 10px; display: flex; flex-direction: column; gap: 4px; }
+.nav h3 { margin: 4px 8px 12px; color: var(--gold); letter-spacing: .12em; font-size: .85em; }
+.nav button { text-align: left; background: none; border: none; color: var(--muted); padding: 8px 10px;
+  border-radius: 8px; cursor: pointer; font-size: .95em; }
+.nav button.on { background: var(--panel2); color: var(--text); }
+.pane { padding: 18px 22px; overflow: auto; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.pane h2 { margin: 0; font-size: 1.25em; }
+.pane .lead { color: var(--muted); margin: -6px 0 0; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 9px; }
+.box h4 { margin: 0; font-size: .8em; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+input[type=text], input[type=password], select { background: var(--panel2); color: var(--text);
+  border: 1px solid var(--line); border-radius: 7px; padding: 5px 9px; font: inherit; font-size: .92em; }
+input:focus, select:focus { outline: 1px solid var(--gold); }
+.lane { display: grid; grid-template-columns: 70px 1fr; gap: 10px; align-items: start; padding: 10px 0;
+  border-top: 1px solid var(--line); }
+.lane:first-of-type { border-top: none; }
+.lane .ln { font-weight: 800; color: var(--gold); padding-top: 7px; }
+.mine { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.champ { display: flex; align-items: center; gap: 7px; background: var(--panel2); border: 1px solid var(--line);
+  border-radius: 9px; padding: 4px 6px 4px 4px; }
+.champ .nm { font-weight: 600; font-size: .92em; }
+.rate5 { display: flex; }
+.rate5 button { background: none; border: none; padding: 0 1px; cursor: pointer; color: #34465f; font-size: 1.05em; line-height: 1; }
+.rate5 button.on { color: var(--gold); }
+.x { background: none; border: none; color: var(--faint); cursor: pointer; font-size: 1em; padding: 0 2px; }
+.x:hover { color: var(--them); }
+.add { width: 210px; }
+/* the Champions page (M22) */
+.sheet3 { position: relative; width: min(1000px, 100%); background: var(--bg); border: 1px solid var(--line); border-radius: 14px;
+  display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.sheet3 .pane { flex: 1; }
+.ideas { display: grid; gap: 6px; }
+.irow { display: flex; align-items: center; gap: 10px; background: var(--panel2); border: 1px solid var(--line);
+  border-radius: 9px; padding: 5px 8px; }
+.irow .nm { font-weight: 650; }
+.irow .why { flex: 1; min-width: 0; color: var(--muted); font-size: .88em; }
+.tip { border-left: 3px solid var(--gold); background: rgba(201,169,92,.08); border-radius: 0 8px 8px 0;
+  padding: 8px 12px; color: var(--muted); }
+.tip b { color: #f0dcae; }
+/* the champion search's list: our own, so it can show pictures */
+.drop { position: fixed; z-index: 30; display: none; width: 270px; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--panel); border: 1px solid #3a5480; border-radius: 10px; padding: 4px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+.drop.on { display: block; }
+.opt { display: flex; align-items: center; gap: 9px; padding: 4px 8px; border-radius: 7px; cursor: pointer; }
+.opt.on { background: var(--panel2); }
+.opt.added { color: var(--faint); cursor: default; }
+.opt .tag { margin-left: auto; font-size: .78em; color: var(--faint); }
+.drop .none { padding: 8px 10px; color: var(--faint); }
+.state { font-weight: 650; }
+.state.ok { color: var(--us); } .state.bad { color: var(--them); } .state.none { color: var(--faint); }
+.saved { color: var(--us); font-size: .85em; }
+.err { color: var(--them); font-size: .88em; }
+.saved:empty, .err:empty { display: none; }
+.switch { position: relative; width: 44px; height: 24px; border-radius: 999px; background: var(--panel2);
+  border: 1px solid var(--line); cursor: pointer; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--faint); transition: left .15s, background .15s; }
+.switch.on { background: rgba(43,183,166,.3); border-color: var(--us); }
+.switch.on::after { left: 22px; background: var(--us); }
+.commits { margin: 0; padding-left: 18px; color: var(--muted); font-size: .9em; }
+a { color: var(--gold); }
+.kit { margin: 3px 0 2px; display: grid; gap: 2px; font-size: .86em; }
+.kit .k { color: var(--muted); } .kit .k b { color: var(--text); font-weight: 600; }
+#teams, #history { position: fixed; inset: 0; display: none; background: rgba(4,8,14,.72); z-index: 10; }
+#teams.on, #history.on { display: flex; justify-content: center; padding: 22px; }
+#teams .sheet2, #history .sheet2 { width: min(1250px, 100%); background: var(--bg); border: 1px solid var(--line); border-radius: 14px;
+  display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+#history .sheet2 { width: min(820px, 100%); }
+#teams .top, #history .top { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+#teams .top h2, #history .top h2 { margin: 0; font-size: 1.15em; flex: 1; }
+.hlist { flex: 1; min-height: 0; overflow: auto; padding: 10px 14px; }
+.hrow { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; background: var(--panel); cursor: pointer; }
+.hrow:hover { border-color: #3a5480; }
+.hrow .when { width: 128px; color: var(--muted); font-size: .85em; }
+.hrow .who { flex: 1; } .hrow .acct { color: var(--muted); font-size: .82em; }
+.pastbar { display: flex; align-items: center; gap: 10px; padding: 7px 12px; margin-bottom: 10px; border: 1px solid rgba(201,169,92,.5); background: rgba(201,169,92,.12); border-radius: 10px; }
+.pastbar .grow { flex: 1; }
+.hres li.y::marker { color: var(--us); } .hres li.n::marker { color: var(--them); }
+.reporttext { white-space: pre-wrap; font-family: Consolas, monospace; font-size: .85em; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.cols { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 14px; overflow: auto; }
+.col h3 { margin: 0 0 8px; font-size: .8em; letter-spacing: .1em; }
+.champ2 { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 8px; }
+.champ2 .hd { display: flex; gap: 9px; align-items: center; margin-bottom: 5px; }
+.champ2 .hd .nm { font-weight: 700; font-size: 1.05em; }
+.champ2 .ab { font-size: .86em; margin: 3px 0; } .champ2 .ab b { color: #f1d9a0; font-weight: 600; }
+.lvl { padding: 0 6px; border-radius: 5px; font-size: .78em; background: var(--panel2); border: 1px solid var(--line); }
+.lvl.high { color: var(--gold); } .lvl.low { color: var(--faint); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bar">
+    <img class="logo" src="__LOGO__" alt="">
+    <span class="brand">SIDEKICK</span>
+    <span id="pill" class="pill">Starting</span>
+    <span id="msg" class="grow"></span>
+    <span id="job" class="job"><span class="spin"></span><span id="jobtext"></span></span>
+    <button id="updatebtn" class="alert update" hidden onclick="openUpdate()" title="A new version of Sidekick is on GitHub"></button>
+    <button id="researchbtn" class="alert research" hidden onclick="openResearch()"></button>
+    <button class="btn" onclick="openHistory()" title="Your past games and their reports, kept on this PC only">History</button>
+    <button class="btn" onclick="openChamps()" title="The champions you play in each lane, for the account logged in">Champions</button>
+    <button class="btn" onclick="openSettings()" title="Account, keys, AI writer, data and updates">Settings</button>
+  </div>
+  <div id="notice" class="notice"><span id="noticetext"></span><button onclick="dismiss()" title="Dismiss">&times;</button></div>
+  <main id="main"></main>
+</div>
+<div id="teams" onclick="if (event.target === this) closeTeams()">
+  <div class="sheet2">
+    <div class="top"><h2>Both teams, in Riot's words</h2><span class="small">Kits and tips: Riot. Ratings: Riot (low, moderate, high). Mechanics: the LoL Wiki.</span><button class="close" onclick="closeTeams()" title="Close (Esc)">&times;</button></div>
+    <div class="cols" id="teamcols"></div>
+  </div>
+</div>
+<div id="history" onclick="if (event.target === this) closeHistory()">
+  <div class="sheet2">
+    <div class="top"><h2>History</h2><span class="small">Your past games, kept on this PC only</span><select id="histacct" onchange="drawHistory()" title="Which account's games"></select><button class="close" onclick="closeHistory()" title="Close (Esc)">&times;</button></div>
+    <div class="hlist" id="histlist"></div>
+  </div>
+</div>
+<div id="settings" onclick="if (event.target === this) closeSettings()">
+  <div class="sheet">
+    <button class="close" onclick="closeSettings()" title="Close (Esc)">&times;</button>
+    <div class="nav">
+      <h3>SETTINGS</h3>
+      <button data-tab="account" onclick="tab('account')">Account and Riot key</button>
+      <button data-tab="ai" onclick="tab('ai')">AI report writer</button>
+      <button data-tab="app" onclick="tab('app')">Data and updates</button>
+    </div>
+    <div class="pane" id="pane"></div>
+  </div>
+</div>
+<div id="champs" onclick="if (event.target === this) closeChamps()">
+  <div class="sheet3">
+    <button class="close" onclick="closeChamps()" title="Close (Esc)">&times;</button>
+    <div class="pane" id="champpane"></div>
+  </div>
+</div>
+<div id="drop" class="drop" onmousedown="event.preventDefault()"></div>
+<script>
+const ROLE = {top: "TOP", jungle: "JG", mid: "MID", bot: "BOT", support: "SUP"};
+const LANE_NAME = {top: "Top", jungle: "Jungle", mid: "Mid", bot: "Bot", support: "Support"};
+const STATE_TEXT = {waiting_client: "Waiting for the League client", waiting_game: "Waiting for a game",
+  champ_select: "Champion select", picks_locked: "Picks locked", writing: "Writing your report",
+  in_game: "Game in progress", ended: "Game ended", setup: "Getting ready", problem: "Needs a look"};
+let view = null, version = -1;
+
+async function api(name, payload) {
+  try { return await window.pywebview.api.action(name, payload || {}); }
+  catch (e) { return {error: String(e)}; }
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[c]); }
+function list(items) { return items && items.length ? "<ul>" + items.map(i => String(i).startsWith("No data; AI read:") ? `<li class="ai"><span class="aitag">AI read, no data</span> ${esc(String(i).slice(17).trim())}</li>` : `<li>${esc(i)}</li>`).join("") + "</ul>" : `<div class="small">Nothing notable.</div>`; }
+function card(title, body, sub) { return `<section class="card"><h2>${esc(title)}${sub ? ` <span class="sub">${esc(sub)}</span>` : ""}</h2>${body}</section>`; }
+function stars(n) { if (!n) return ""; return `<span class="stars" title="Your comfort: ${n} of 5">${"&#9733;".repeat(n)}<span class="off">${"&#9733;".repeat(5 - n)}</span></span>`; }
+
+// ---- champion pictures: fetched once from the app, kept here
+const ICONS = {}, wanted = new Set(); let iconTimer = null;
+function pic(id, size, lazy) {
+  const cls = "pt" + (size ? " " + size : "");
+  if (!id) return `<span class="${cls} none"></span>`;
+  const src = ICONS[id];
+  if (src === undefined && !lazy) want(id);  // lazy: asked for once visible (lazyIcons)
+  return `<img class="${cls}" data-id="${esc(id)}" alt=""${src ? ` src="${src}"` : ""}>`;
+}
+function want(id) { if (!wanted.has(id)) { wanted.add(id); if (!iconTimer) iconTimer = setTimeout(fetchIcons, 40); } }
+async function fetchIcons() {
+  iconTimer = null;
+  const ids = [...wanted].filter(id => ICONS[id] === undefined);
+  if (!ids.length) return;
+  const r = await api("icons", {ids});
+  const got = (r && r.icons) || {};
+  for (const id of ids) ICONS[id] = got[id] || null;
+  document.querySelectorAll("img[data-id]").forEach(img => { const s = ICONS[img.dataset.id]; if (s && !img.getAttribute("src")) img.src = s; });
+}
+
+function meter(label, value, max, posText, negText) {
+  if (value === null || value === undefined) return "";
+  const v = Math.max(-max, Math.min(max, value)), pct = Math.abs(v) / max * 50;
+  const left = v >= 0 ? 50 : 50 - pct, color = v > 0.05 ? "var(--us)" : v < -0.05 ? "var(--them)" : "var(--even)";
+  const word = v >= 1 ? posText : v <= -1 ? negText : "Even";
+  return `<div class="meter"><span class="small">${esc(label)}</span><div class="track"><div class="fill" style="left:${left}%;width:${Math.max(pct, 1.5)}%;background:${color}"></div><div class="mid"></div></div><span class="small" style="text-align:right">${esc(word)}</span></div>`;
+}
+
+function renderStatus(v) {
+  const problem = v.state === "problem", setup = v.state === "setup";
+  const title = v.title || STATE_TEXT[v.state] || v.state;
+  const hint = problem ? `<button class="btn primary" onclick="openSettings()">Open Settings</button>`
+    : setup ? `<div class="small">This happens once; Sidekick opens by itself when it's done.</div>`
+    : `<div class="small">Keep this window open. It follows the League client by itself.</div>`;
+  return `<div class="status"><img class="hero" src="__LOGO__" alt=""><div class="dot${problem ? " warn" : ""}"></div><div class="big">${esc(title)}</div><div>${esc(v.message || "")}</div>${hint}</div>`;
+}
+
+function renderPicks(v) {
+  const title = v.opponent ? `Pick options for ${v.role} into ${v.opponent}` : `Pick options for ${v.role} (their ${v.role} isn't locked yet)`;
+  const unsure = v.opponent && v.opponent_confidence < 0.6 ? ` <span class="badge b-gold">role guess ${Math.round(v.opponent_confidence * 100)}%</span>` : "";
+  const cards = v.options.map(o => {
+    const cls = o.outlook === "favorable" ? "b-us" : (o.outlook === "soft_counter" || o.outlook === "hard_counter") ? "b-them" : "b-even";
+    const num = o.rate !== null ? `${o.rate}%` : (o.own !== null ? `${o.own}%` : "-");
+    const what = o.rate !== null ? "game win rate into them" : (o.own !== null ? "win rate this patch" : "no numbers yet");
+    const tag = o.stars ? "In your pool" : o.main ? "Your main" : o.source === "mastery" ? "You play it a lot" : o.source === "meta" ? "Outside your pool" : "In your pool";
+    return `<div class="pick"><div class="top">${pic(o.id, "l")}<div><div class="nm">${esc(o.name)}</div>${stars(o.stars)}</div></div><div><span class="badge ${cls}">${esc(o.outlook_text || (o.blind ? "Blind pick" : ""))}</span> <span class="chip">${esc(tag)}</span></div><div class="gauge"><span class="rate">${esc(num)}</span><span class="small">${esc(what)}</span></div>${o.blind && o.blind[1] >= 5 ? `<div class="small">Hard-countered by ${o.blind[0]} of ${o.blind[1]} common picks</div>` : ""}${o.synergy ? `<div class="small" style="color:${o.synergy.startsWith("pairs well") ? "var(--us)" : "var(--them)"}">${esc(o.synergy)}</div>` : ""}${o.reason ? `<div>${esc(o.reason)}</div>` : ""}</div>`;
+  }).join("") || `<div class="small">Nothing to suggest yet. Add your champions with the Champions button at the top.</div>`;
+  const slots = (team, enemy) => team.map(s => `<div class="slot ${!enemy && s.role === v.draft.me ? "me" : ""}"><span class="r">${ROLE[s.role]}</span>${pic(s.id, "s")}<span class="${s.name ? "" : "empty"}">${esc(s.name || "not locked")}</span><span class="small">${enemy && s.name && s.confidence !== null && s.confidence < 0.99 ? Math.round(s.confidence * 100) + "% sure" : ""}</span></div>`).join("");
+  const bans = v.draft.bans.length ? `<div class="row small">Bans: ${(v.draft.ban_ids || []).map(id => pic(id, "s")).join("")} ${esc(v.draft.bans.join(", "))}</div>` : "";
+  return `<div class="head"><h1>${esc(title)}</h1>${unsure}</div><div class="picks">${cards}</div>${v.note ? `<div class="small">${esc(v.note)}</div>` : ""}<div class="draft">${card("Your team", slots(v.draft.ally, false))}${card("Their team", slots(v.draft.enemy, true) + bans)}</div><div class="small">Options, not orders: comfort matters as much as the numbers.</div>`;
+}
+
+function laneCard(l) {
+  if (!l) return "";
+  const phases = l.phases.map(p => `<div class="phase p-${p.side}"><b>${p.side === "us" ? "You" : p.side === "them" ? "Them" : p.side === "even" ? "Even" : "?"}</b>${esc(p.label)}</div>`).join("");
+  return card("Your lane", `<div class="small">${esc(l.us)} vs ${esc(l.them)}${l.source === "stats" ? " - verdict from OP.GG's data" : ""}</div>` +
+    meter("Wave control", l.push_diff, 3, "You push", "They push") + meter("Fights", l.fight_diff, 4, "You win", "They win") +
+    `<div class="small">Who's favored, by phase (when to trade or engage)</div><div class="phases">${phases}</div>` + list(l.items), l.label_text || l.verdict_text);
+}
+
+function oppCard(opps, title) {
+  if (!opps || !opps.length) return card(title, `<div class="small">Not known yet.</div>`);
+  return card(title, opps.map(o => `<div class="opp"><div class="top">${pic(o.id, "m")}<div class="name">${esc(o.name)} <span class="small">${esc(o.role)}${o.range ? " - " + esc(o.range) : ""}${o.attack_range ? " " + o.attack_range : ""}${o.spells && o.spells.length ? " - " + esc(o.spells.join(", ")) : ""}</span></div></div>${o.passive ? `<div class="passive"><b>${esc(o.passive.name)}</b> (passive): ${esc(o.passive.text)}</div>` : ""}${(o.kit || []).length ? `<div class="kit">${o.kit.map(a => `<div class="k"><b>${esc(a.slot)} ${esc(a.name)}</b>: ${esc(a.text)}</div>`).join("")}</div>` : ""}${o.tips.length ? `<div class="riot">Riot's tips against them</div>` + list(o.tips) : ""}</div>`).join(""), "in Riot's words");
+}
+
+function counterCard(c) {
+  if (!c) return card("Counter-pick", `<div class="small">Not known yet.</div>`);
+  const cls = c.outlook === "favorable" ? "b-us" : (c.outlook === "soft_counter" || c.outlook === "hard_counter") ? "b-them" : "b-even";
+  return card("Counter-pick", `<div class="gauge"><span class="num">${c.rate !== null ? c.rate + "%" : "-"}</span><span class="small">${c.rate !== null ? "game win rate" : "no reliable numbers"}</span> <span class="badge ${cls}">${esc(c.outlook_text)}</span></div>` + list(c.items) + (c.build.length ? `<div class="small">Their usual build into you</div><div class="chips">${c.build.map(b => `<span class="chip">${esc(b)}</span>`).join("")}</div>` : ""));
+}
+
+// Likely duos and one-tricks: the AI's lines when it wrote them in, else the raw lines
+function loadingCard(v, otherwise) {
+  if ((v.sections || []).some(s => s.key === "loading_screen" && s.items.length)) return sectionsCard("Loading screen", v, ["loading_screen"]);
+  return (v.addendum || []).length ? card("Loading screen", list(v.addendum)) : otherwise;
+}
+
+function sectionsCard(title, v, keys) {
+  const secs = v.sections.filter(s => keys.includes(s.key) && s.items.length);
+  if (!secs.length) return card(title, `<div class="small">Nothing notable.</div>`);
+  return card(title, secs.map(s => `<div class="small" style="color:var(--gold)">${esc(s.title)}</div>` + list(s.items)).join(""));
+}
+
+function lanesCard(l) {
+  const faces = r => `<span class="faces">${(r.us_ids || []).map(id => pic(id, "s")).join("")}<i>vs</i>${(r.them_ids || []).map(id => pic(id, "s")).join("")}</span>`;
+  const rows = l.rows.map(r => `<div class="lrow"><span class="ln">${r.lane.toUpperCase()}</span><span class="mid2">${faces(r)}<span class="who">${esc(r.us)} <span>vs</span> ${esc(r.them)}${r.label_text ? ` <span>- ${esc(r.label_text)}</span>` : ""}</span></span><span class="badge ${r.verdict === "winning" ? "b-us" : r.verdict === "losing" ? "b-them" : "b-even"}">${esc(r.verdict_text)}${r.volatile ? " - volatile" : ""}</span>${r.gank_rank ? `<span class="rank" title="Your gank ranking">#${r.gank_rank}</span>` : "<span></span>"}</div>`).join("");
+  const route = l.route.target ? `<div class="small">Route: start ${esc(l.route.start)} side, first clear ends near ${esc(l.route.target)}${l.route.counter ? `; their jungler likely shows ${esc(l.route.counter)} first` : ""}.</div>` : "";
+  return card("Lanes at a glance", `<div class="lanes">${rows}</div>${route}` + list(l.items.slice(1)));
+}
+
+function renderReport(v) {
+  const h = v.header;
+  const opp = (v.opponents || []).map(o => o.name).join(" + ");
+  const phase = `<span class="badge b-gold">${v.written ? "Your report" : "Your report - rules version"}</span>`;
+  const tags = `<span class="chip">patch ${esc(h.patch)}</span>${h.side ? `<span class="chip">${esc(h.side)} side</span>` : ""}`;
+  const lane = v.lane;
+  const plan = `<div class="plan"><span class="txt">${esc(v.plan || "No game plan yet.")}</span>${lane && (lane.label_text || lane.verdict_text) ? `<span class="badge ${lane.verdict === "winning" ? "b-us" : lane.verdict === "losing" ? "b-them" : "b-even"}">${esc(lane.label_text || lane.verdict_text)}</span>` : ""}</div>`;
+  let grid;
+  if (h.role === "jungle") {
+    grid = lanesCard(v.lanes) + sectionsCard("Best gank options", v, ["gank_first"]) + oppCard(v.opponents, "Enemy jungler") +
+      sectionsCard("Start and objectives", v, ["start_objectives", "enemy_jungler"]) + counterCard(v.counterpick) +
+      sectionsCard("Watch out", v, ["watch_out", "dont_feed"]) + loadingCard(v, "");
+  } else {
+    const job = {top: ["your_job", "punish"], mid: ["roams", "punish"], bot: ["fights", "punish"], support: ["protect_or_engage", "roams", "punish"]}[h.role];
+    grid = laneCard(lane) + oppCard(v.opponents, "Know your opponent") + sectionsCard("Your jungler", v, ["jungle"]) +
+      counterCard(v.counterpick) + sectionsCard("Watch out", v, ["watch_out", "dont_feed", "map_threats"]) +
+      loadingCard(v, sectionsCard("Your job", v, job));
+  }
+  const warn = (v.warnings || []).length ? `<div class="warn"><b>Notes:</b> ${v.warnings.map(esc).join(" | ")}</div>` : "";
+  const notes = (v.notes || []).length ? `<div class="warn"><b>Your notes:</b> ${v.notes.map(esc).join(" | ")}</div>` : "";
+  const oppPics = (v.opponents || []).map(o => pic(o.id, "m")).join("");
+  const players = (v.players || []).length ? playersStrip(v.players) : "";
+  const teamsBtn = (v.kits || []).length ? `<button class="btn" onclick="openTeams()" title="Every champion's kit, Riot's ratings and tips">Both teams</button>` : "";
+  return `<div class="head">${pic(h.champion_id, "l")}<h1>${esc(h.champion)} <span class="vs">${esc(h.role)}${opp ? " vs " + esc(opp) : ""}</span></h1>${oppPics}<div class="tags">${teamsBtn}${phase}${tags}</div></div>${plan}<div class="grid">${grid}</div>${players}${notes}${warn}`;
+}
+
+function playersStrip(players) {
+  const chip = p => {
+    if (p.note) return `<div class="pchip ${p.side}" title="${esc(p.text)}">${pic(p.id, "s")}<div class="t"><b>${esc(p.champion)}</b><div class="small">${esc(p.note)}</div></div></div>`;
+    const games = p.games ? `${p.games} game${p.games === 1 ? "" : "s"}${p.win_rate !== null ? `, ${p.win_rate}% won` : ""}` : "no ranked games on it";
+    return `<div class="pchip ${p.side}" title="${esc(p.text)}">${pic(p.id, "s")}<div class="t"><b>${esc(p.champion)}</b> <span class="small">${esc(p.rank)}</span><div class="small">${esc(games)}${p.average_kda ? " - " + esc(p.average_kda) : ""}</div></div></div>`;
+  };
+  const row = (side, label) => { const ps = players.filter(p => p.side === side); return ps.length ? `<div class="prow"><span class="side" style="color:var(--${side})">${label}</span>${ps.map(chip).join("")}</div>` : ""; };
+  return `<div class="plist">${row("us", "TEAM")}${row("them", "THEM")}</div>`;
+}
+
+function render() {
+  const main = document.getElementById("main"), pill = document.getElementById("pill"), msg = document.getElementById("msg");
+  if (past) { main.innerHTML = renderPast(past); pill.textContent = "Past game"; pill.className = "pill"; return; }
+  if (!view) { main.innerHTML = renderStatus({state: "waiting_client", message: "Starting up..."}); return; }
+  if (view.screen === "status") { main.innerHTML = renderStatus(view); pill.textContent = view.title || STATE_TEXT[view.state] || view.state; pill.className = "pill"; msg.textContent = view.message || ""; }
+  else if (view.screen === "picks") { main.innerHTML = renderPicks(view); pill.textContent = "Champion select"; pill.className = "pill live"; }
+  else if (view.screen === "report") { main.innerHTML = renderReport(view); pill.textContent = "Your report"; pill.className = "pill final"; }
+}
+window.SK = { show(v) { view = v; render(); }, status(text) { document.getElementById("msg").textContent = text; } };
+
+function showMeta(m) {
+  if (!m) return;
+  const job = document.getElementById("job");
+  job.className = "job" + (m.job ? " on" : "");
+  document.getElementById("jobtext").textContent = m.job ? m.job + "..." : "";
+  const n = document.getElementById("notice");
+  n.className = "notice" + (m.notice ? " on" : "");
+  document.getElementById("noticetext").textContent = m.notice || "";
+  const upd = document.getElementById("updatebtn");
+  upd.hidden = !m.update;
+  if (m.update) upd.textContent = `Update available (${m.update.behind} change${m.update.behind === 1 ? "" : "s"})`;
+  const res = document.getElementById("researchbtn"), due = (m.research && m.research.remind && m.research.prompts) || [];
+  res.hidden = !due.length;
+  if (due.length) { res.textContent = `Research due (${due.length})`; res.title = `Patch ${m.research.patch}: run ${due.map(p => p.replace("_", " ")).join(", ")} (research folder)` + ((m.research.updates || []).length ? `; new on the patch page: ${m.research.updates.join(", ")}` : ""); }
+  if (busyJob && !m.job) { busyJob = false; if (S) loadSettings(); }
+  if (m.job) busyJob = true;
+}
+let busyJob = false;
+async function dismiss() { document.getElementById("notice").className = "notice"; await api("dismiss"); }
+
+// ---- settings
+let S = null, current = "account", update = null;
+const SAVE_MSG = {};
+async function openSettings() { document.getElementById("settings").className = "on"; await loadSettings(); }
+function closeSettings() { document.getElementById("settings").className = ""; }
+async function loadSettings() {
+  const r = await api("settings");
+  if (r.error) { document.getElementById("pane").innerHTML = `<div class="err">${esc(r.error)}</div>`; return; }
+  S = r; tab(current);
+}
+function tab(name) {
+  current = name;
+  document.querySelectorAll(".nav button[data-tab]").forEach(b => b.className = b.dataset.tab === name ? "on" : "");
+  if (!S) return;
+  const pane = document.getElementById("pane");
+  pane.innerHTML = {account: paneAccount, ai: paneAi, app: paneApp}[name]();
+}
+function flash(key, text, bad) { SAVE_MSG[key] = {text, bad}; const el = document.getElementById("msg-" + key); if (el) { el.className = bad ? "err" : "saved"; el.textContent = text; } }
+function msgSlot(key) { const m = SAVE_MSG[key]; return `<div id="msg-${key}" class="${m && m.bad ? "err" : "saved"}">${m ? esc(m.text) : ""}</div>`; }
+
+// ---- the Champions page (M22): your champions per lane, for the account logged in.
+// Each account keeps its own list (scout/accounts.py); every change saves by itself.
+let C = null, POOL = {}, IDEAS = [], ideaNote = "", saveTimer = null;
+async function openChamps() {
+  await flushPool();
+  document.getElementById("champs").className = "on";
+  C = null; IDEAS = []; ideaNote = ""; SAVE_MSG.pool = SAVE_MSG.ideas = null; drawChamps();
+  const r = await api("champions");
+  if (r.error) { document.getElementById("champpane").innerHTML = `<h2>Your champions</h2><div class="err">${esc(r.error)}</div>`; return; }
+  C = r; POOL = JSON.parse(JSON.stringify(r.pool)); drawChamps();
+  recentIdeas();
+}
+async function closeChamps() { closePick(); document.getElementById("champs").className = ""; await flushPool(); }
+function drawChamps() {
+  closePick();
+  const pane = document.getElementById("champpane");
+  if (!C) { pane.innerHTML = `<h2>Your champions</h2><div class="small">Loading...</div>`; return; }
+  const a = C.account;
+  const who = !a ? "Open the League client so Sidekick knows which account this is: each account keeps its own list. Until then, changes go to the list a new account starts from."
+    : a.live ? `For <b>${esc(a.riot_id)}</b>, logged in now. Each account keeps its own list: switching accounts switches it.`
+    : `For <b>${esc(a.riot_id)}</b>, the account logged in last. Each account keeps its own list: log in to another to see its list.`;
+  const lanes = Object.keys(LANE_NAME).map(role => {
+    const mine = [...(POOL[role] || [])].sort((x, y) => y.stars - x.stars);
+    const chips = mine.map(c => `<span class="champ">${pic(c.id, "m")}<span><div class="nm">${esc(c.name)}</div><div class="rate5">${[1, 2, 3, 4, 5].map(n => `<button class="${n <= c.stars ? "on" : ""}" title="${n} of 5" onclick="rate('${role}','${esc(c.id)}',${n})">&#9733;</button>`).join("")}</div></span><button class="x" title="Remove" onclick="removeChamp('${role}','${esc(c.id)}')">&times;</button></span>`).join("");
+    return `<div class="lane"><span class="ln">${LANE_NAME[role]}</span><div class="mine">${chips || `<span class="small">No champions yet.</span>`}<input class="add" type="text" data-role="${role}" placeholder="Add a champion..." autocomplete="off" spellcheck="false" onfocus="openPick('${role}', this)" oninput="findPick()" onkeydown="keyPick(event)" onblur="closePick()"></div></div>`;
+  }).join("");
+  pane.innerHTML = `<h2>Your champions</h2><p class="lead">${who} Changes save as you make them.</p>
+    ${ideasBox()}<div class="tip"><b>Keep your star ratings accurate: they help Sidekick.</b> 1 star = still learning, 5 = your main. Your pick options are ranked with them: a more comfortable champion comes first unless another is clearly better (about 1% win rate per star of difference).</div>
+    <div class="box">${lanes}${msgSlot("pool")}</div>`;
+}
+function findChamp(id) { return C.champions.find(c => c.id === id); }
+function rate(role, id, n) { const c = (POOL[role] || []).find(c => c.id === id); if (c) { c.stars = n; drawChamps(); savePoolSoon(); } }
+function removeChamp(role, id) { POOL[role] = (POOL[role] || []).filter(c => c.id !== id); drawChamps(); savePoolSoon(); }
+function addChamp(role, id) {
+  const champ = findChamp(id); if (!champ) return;
+  POOL[role] = POOL[role] || [];
+  if (!POOL[role].some(c => c.id === id)) POOL[role].push({id, name: champ.name, stars: 3});
+  drawChamps(); savePoolSoon();
+}
+function savePoolSoon() { clearTimeout(saveTimer); flash("pool", "Saving...", false); saveTimer = setTimeout(savePool, 500); }
+async function flushPool() { if (saveTimer) { clearTimeout(saveTimer); await savePool(); } }
+async function savePool() {
+  saveTimer = null;
+  if (!C) return;
+  const out = {};
+  for (const role in POOL) out[role] = POOL[role].map(c => ({id: c.id, stars: c.stars}));
+  const r = await api("save_pool", {pool: out, account: C.account ? C.account.key : ""});
+  flash("pool", r.error ? r.error : "Saved. Used from the next pick.", !!r.error);
+}
+
+// suggestions from your own games: recent games (automatic) and mastery (the button)
+function ideasBox() {
+  const listed = new Set(Object.values(POOL).flat().map(c => c.id));
+  const shown = IDEAS.filter(i => i.kind === "mastery" ? !listed.has(i.id) : !(POOL[i.role] || []).some(c => c.id === i.id));
+  const rows = shown.map(i => `<div class="irow">${pic(i.id)}<span class="nm">${esc(i.name)}</span><span class="why">${esc(i.why)}</span><button class="btn small primary" onclick="addChamp('${i.role}','${esc(i.id)}')">Add to ${LANE_NAME[i.role]}</button><button class="btn small" title="Don't suggest it for ${LANE_NAME[i.role]} again" onclick="declineIdea('${i.role}','${esc(i.id)}')">No</button></div>`).join("");
+  const note = shown.some(i => i.kind === "recent") ? "" : `<div class="small">${esc(ideaNote || "Looking at your recent games...")}</div>`;
+  return `<div class="box" id="ideasbox"><h4>Suggestions from your games</h4>${note}${rows ? `<div class="ideas">${rows}</div>` : ""}
+    <div class="row"><button class="btn" onclick="masteryIdeas()">Suggest from my most-played</button><span class="small">Your highest-mastery champions that aren't in your list yet, each with the lane it's played in most.</span></div>${msgSlot("ideas")}</div>`;
+}
+function drawIdeas() { const box = document.getElementById("ideasbox"); if (box) box.outerHTML = ideasBox(); }
+function otherAccount(r) { return !C || !C.account || r.account !== C.account.key; }
+async function recentIdeas() {
+  const r = await api("suggestions");
+  if (!C) return;
+  if (r.error) ideaNote = r.error;
+  else if (otherAccount(r)) ideaNote = "Another account is logged in now: close and reopen this page.";
+  else {
+    IDEAS = IDEAS.filter(i => i.kind !== "recent").concat(r.ideas.map(i => ({...i, kind: "recent", why: `Played ${LANE_NAME[i.role]} in ${i.games} of your last ${r.games} games`})));
+    ideaNote = r.games ? `Nothing new from your last ${r.games} games. A champion shows up here once you've played it ${r.minimum} or more times in a lane where it isn't in your list.`
+      : "No Summoner's Rift games in the client's recent match history yet.";
+  }
+  drawIdeas();
+}
+async function masteryIdeas() {
+  flash("ideas", "Reading your mastery...", false);
+  const r = await api("pool_ideas");
+  if (!C) return;
+  if (r.error) { flash("ideas", r.error, true); return; }
+  if (otherAccount(r)) { flash("ideas", "Another account is logged in now: close and reopen this page.", true); return; }
+  const fresh = r.ideas.filter(i => !IDEAS.some(j => j.role === i.role && j.id === i.id)).map(i => ({...i, kind: "mastery", why: `${i.points.toLocaleString()} mastery points; mostly played ${LANE_NAME[i.role]} (OP.GG)`}));
+  IDEAS = IDEAS.concat(fresh);
+  SAVE_MSG.ideas = {text: r.ideas.length ? "" : "Nothing new: your most-played champions are all in your list.", bad: false};
+  drawIdeas();
+}
+async function declineIdea(role, id) {
+  IDEAS = IDEAS.filter(i => !(i.role === role && i.id === id)); drawIdeas();
+  const r = await api("decline", {account: C && C.account ? C.account.key : "", role, id});
+  if (r.error) flash("ideas", r.error, true);
+}
+
+// the champion search: our own list with pictures (the browser's list can't show them)
+let pickRole = null, pickInput = null, pickHits = [], pickAt = 0, pickSeen = null;
+function plain(s) { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ""); }
+function openPick(role, input) { pickRole = role; pickInput = input; findPick(); }
+function findPick() {
+  if (!pickInput || !C) return;
+  const q = plain(pickInput.value), first = [], rest = [];
+  for (const c of C.champions) {
+    const n = plain(c.name), id = plain(c.id);
+    if (!q || n.startsWith(q) || id.startsWith(q)) first.push(c);
+    else if (n.includes(q) || id.includes(q)) rest.push(c);
+  }
+  pickHits = first.concat(rest);
+  const have = new Set((POOL[pickRole] || []).map(c => c.id));
+  pickAt = Math.max(0, pickHits.findIndex(c => !have.has(c.id)));
+  const drop = document.getElementById("drop");
+  drop.innerHTML = pickHits.length ? pickHits.map((c, i) => `<div class="opt${i === pickAt ? " on" : ""}${have.has(c.id) ? " added" : ""}" onmousedown="event.preventDefault(); choosePick(${i}, false)" onmousemove="markPick(${i}, false)">${pic(c.id, "", true)}<span>${esc(c.name)}</span>${have.has(c.id) ? `<span class="tag">added</span>` : ""}</div>`).join("")
+    : `<div class="none">No champion called "${esc(pickInput.value)}"</div>`;
+  drop.className = "drop on"; drop.scrollTop = 0;
+  placePick(); lazyIcons(drop);
+}
+function placePick() {  // under the box, or above it when there's more room there
+  if (!pickInput) return;
+  const drop = document.getElementById("drop"), r = pickInput.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom - 10, above = r.top - 10, up = below < 240 && above > below;
+  drop.style.maxHeight = Math.min(380, up ? above : below) + "px";
+  drop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - drop.offsetWidth - 8)) + "px";
+  drop.style.top = up ? "auto" : (r.bottom + 4) + "px";
+  drop.style.bottom = up ? (window.innerHeight - r.top + 4) + "px" : "auto";
+}
+function lazyIcons(box) {  // pictures for the rows in view (and just below), not all 170
+  if (pickSeen) pickSeen.disconnect();
+  pickSeen = new IntersectionObserver((seen, watcher) => seen.forEach(e => { if (e.isIntersecting) { want(e.target.dataset.id); watcher.unobserve(e.target); } }), {root: box, rootMargin: "150px"});
+  box.querySelectorAll("img[data-id]:not([src])").forEach(img => pickSeen.observe(img));
+}
+function markPick(i, scroll) {
+  const opts = document.querySelectorAll("#drop .opt");
+  if (!opts.length) return;
+  pickAt = Math.max(0, Math.min(opts.length - 1, i));
+  opts.forEach((o, j) => o.classList.toggle("on", j === pickAt));
+  if (scroll) opts[pickAt].scrollIntoView({block: "nearest"});
+}
+function keyPick(e) {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); markPick(pickAt + (e.key === "ArrowDown" ? 1 : -1), true); }
+  else if (e.key === "Enter") { e.preventDefault(); choosePick(pickAt, true); }
+  else if (e.key === "Escape") { e.stopPropagation(); e.target.blur(); }
+}
+function choosePick(i, keyboard) {
+  const c = pickHits[i], role = pickRole;
+  if (!c || (POOL[role] || []).some(p => p.id === c.id)) return;
+  closePick(); addChamp(role, c.id);
+  if (keyboard) { const box = document.querySelector(`#champpane input[data-role="${role}"]`); if (box) box.focus(); }
+}
+function closePick() {
+  pickInput = pickRole = null;
+  const drop = document.getElementById("drop"); drop.className = "drop"; drop.innerHTML = "";
+  if (pickSeen) { pickSeen.disconnect(); pickSeen = null; }
+}
+document.getElementById("champpane").addEventListener("scroll", placePick);
+window.addEventListener("resize", placePick);
+
+function stateText(state) {
+  return {working: ["Working", "ok"], rejected: ["Rejected: expired or wrong", "bad"], unknown: ["Saved (checked when Sidekick starts)", "ok"], none: ["Not set", "none"]}[state] || [state, "none"];
+}
+function paneAccount() {
+  const a = S.account, [rt, rc] = stateText(S.riot.state);
+  const regions = a.regions.map(r => `<option ${r === a.region ? "selected" : ""}>${r}</option>`).join("") + (a.region === "custom" ? `<option selected value="custom">Custom (config.yaml)</option>` : "");
+  return `<h2>Account and Riot key</h2>
+    <div class="box"><h4>Your account</h4><div>${a.logged_in ? `${a.live ? "Logged in" : "Last logged in"}: <b>${esc(a.logged_in)}</b>, read from the League client.` : "Open the League client: Sidekick reads who is logged in from it."}</div>
+    <div class="row"><span>Region</span><select id="region">${regions}</select><button class="btn" onclick="saveAccount()">Save</button>${a.detected ? `<span class="saved">Set from your games in the client.</span>` : ""}</div>
+    <div class="small">Nothing to type: your champions, picks and reports follow whoever is logged in. The region says which Riot server to ask (the loading-screen checks, the post-game check, match data); Sidekick sets it from the client when it can, so the list is only for an account with no games yet.</div>${msgSlot("account")}</div>
+    <div class="box"><h4>Riot API key</h4><div>Status: <span class="state ${rc}">${esc(rt)}</span></div>
+    <div class="row"><input id="riotkey" type="password" placeholder="RGAPI-..." style="width:340px"><button class="btn primary" onclick="saveKey('riot')">Test and save</button></div>
+    <div class="small">Lets Sidekick measure Riot's own match data in the background (gold at 10, who pushes, level timings, jungle clears, per champion and role), spot enemy one-tricks and players who queue together at the loading screen, and check each report after the game. Get one at <a href="https://developer.riotgames.com" target="_blank">developer.riotgames.com</a>: a development key expires every 24 hours; register a Personal API Key to stop renewing it.</div>${msgSlot("riot")}</div>
+    <div class="box"><h4>Players at the loading screen</h4><div class="row"><span class="switch ${S.players.on ? "on" : ""}" onclick="setPlayers(${!S.players.on})"></span><b>${S.players.on ? "On" : "Off"}</b></div>
+    <div class="small">Each visible player's OP.GG record on their champion: rank, games, win rate, average kills / deaths / assists. Never names. An outside review read Riot's developer policy as discouraging showing other players' rank or win rate; it's your call (docs/POLICY.md).</div>${msgSlot("players")}</div>`;
+}
+async function setPlayers(on) {
+  const r = await api("set_players", {on});
+  SAVE_MSG.players = r.error ? {text: r.error, bad: true} : {text: on ? "On from the next game." : "Off.", bad: false};
+  await loadSettings();
+}
+async function saveAccount() {
+  const r = await api("save_account", {region: document.getElementById("region").value});
+  flash("account", r.error || "Saved. Used from the next game.", !!r.error);
+}
+async function saveKey(kind) {
+  const input = document.getElementById(kind === "riot" ? "riotkey" : "antkey");
+  flash(kind, "Testing the key...", false);
+  const r = await api("save_key", {kind, value: input.value});
+  input.value = "";
+  if (r.error) { flash(kind, r.error, true); return; }
+  SAVE_MSG[kind] = {text: "Saved and working.", bad: false};
+  await loadSettings();
+}
+
+function paneAi() {
+  const l = S.llm, key = l.has_key ? ["Saved", "ok"] : ["Not set", "none"];
+  const per = l.calls_today ? ` (about $${(l.cost_today / l.calls_today).toFixed(3)} each)` : "";
+  return `<h2>AI report writer</h2><p class="lead">At the loading screen, Claude rewrites the final report in plain sentences from the same facts. Off = the free rules report, which has the same content in a list.</p>
+    <div class="box"><div class="row"><span class="switch ${l.on ? "on" : ""}" onclick="setLlm(${!l.on})"></span><b>${l.on ? "On" : "Off"}</b><span class="small">${l.on ? esc(l.model) : ""}</span></div>
+    <div class="small">Today: ${l.calls_today} report${l.calls_today === 1 ? "" : "s"}, $${l.cost_today.toFixed(3)}${per}. Limit: ${l.cap} per day, then the free report.</div>${msgSlot("llm")}</div>
+    <div class="box"><h4>Anthropic API key</h4><div>Status: <span class="state ${key[1]}">${key[0]}</span></div>
+    <div class="row"><input id="antkey" type="password" placeholder="sk-ant-..." style="width:340px"><button class="btn primary" onclick="saveKey('anthropic')">Test and save</button></div>
+    <div class="small">From <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Testing it is free.</div>${msgSlot("anthropic")}</div>`;
+}
+async function setLlm(on) {
+  const r = await api("set_llm", {on});
+  SAVE_MSG.llm = r.error ? {text: r.error, bad: true} : r.warning ? {text: r.warning, bad: true} : {text: on ? "On from the next game." : "Off.", bad: false};
+  await loadSettings();
+}
+
+function paneApp() {
+  const a = S.app;
+  let upd = `<div class="row"><button class="btn" onclick="checkUpdate()">Check for updates</button></div>`;
+  if (update && update.checking) upd = `<div class="row"><span class="spin"></span> Checking GitHub...</div>`;
+  else if (update && update.error) upd += `<div class="err">${esc(update.error)}</div>`;
+  else if (update && !update.available) upd += `<div class="saved">Up to date.</div>`;
+  else if (update && update.available) {
+    upd = `<div><b>${update.behind} update${update.behind === 1 ? "" : "s"} ready:</b></div><ul class="commits">${update.commits.map(c => `<li>${esc(c)}</li>`).join("")}</ul>` +
+      (update.edited.length ? `<div class="small">Files you've changed here: ${esc(update.edited.join(", "))}. Updating keeps them unless the update changes the same files (then it stops and changes nothing).</div>` : "") +
+      `<div class="row"><button class="btn primary" onclick="doUpdate()" ${a.in_game ? "disabled" : ""}>Update and restart</button>${a.in_game ? `<span class="small">After this game.</span>` : `<span class="small">Sidekick closes for a few seconds and reopens.</span>`}</div>`;
+  }
+  return `<h2>Data and updates</h2>
+    <div class="box"><h4>Champion data</h4><div>Patch data <b>${esc(a.patch || "none yet")}</b>${a.data_at ? `, downloaded ${esc(a.data_at)}` : ""}.</div>
+    <div class="row"><button class="btn" onclick="refreshData()">Refresh data</button><span class="small">Gets a new patch's champions and the latest win rates. It also runs each time Sidekick updates.</span></div>${msgSlot("refresh")}</div>
+    <div class="box"><h4>Match data (Riot)</h4><div class="row"><span class="switch ${S.collect.on ? "on" : ""}" onclick="setCollect(${!S.collect.on})"></span><b>${S.collect.on ? "Collecting while you're not in a game" : "Off"}</b></div>
+    <div>${S.collect.games ? `Patch ${esc(S.collect.patch)}: <b>${S.collect.games.toLocaleString()}</b> Emerald+ games measured; ${S.collect.covered} of ${S.collect.wanted} champion-roles have enough games (50+).${S.collect.gap !== null ? ` Win rates differ from OP.GG's by ${S.collect.gap} points on average.` : ""}` : "No games measured yet this patch."}</div>
+    ${(S.collect.changes || []).length ? `<div class="small" style="color:var(--warn)">Changed since last patch:</div>` + list(S.collect.changes) : ""}
+    <div class="small">Gold and XP against the lane opponent, who pushes, level 3 and 4 timings, first item, roaming: measured from Riot's own match data, about 35 games every 2 minutes. Needs the Riot key; pauses during champ select and games.</div>${msgSlot("collect")}</div>
+    <div class="box"><h4>Research results</h4><div class="row"><span class="switch ${S.research && S.research.remind ? "on" : ""}" onclick="setResearchReminders(${!(S.research && S.research.remind)})"></span><b>${S.research && S.research.remind ? "Remind me when research is due" : "No research reminders"}</b><span class="small">Only whoever runs the research prompts needs this; everyone else gets the results with updates.</span></div>${S.research && S.research.prompts.length ? `<div>Due for patch ${esc(S.research.patch)}: <b>${S.research.prompts.map(p => p.replace("_", " ")).join(", ")}</b>${(S.research.updates || []).length ? ` (a mid-patch update: ${esc(S.research.updates.join(", "))})` : ""}. The prompts in the research folder are ready to send as they are.</div>` : `<div class="saved">No research due for this patch.</div>`}<div class="row"><button class="btn" onclick="api('open', {what: 'research'})">Open the research folder</button><button class="btn" onclick="researchPlan()">Check research/results</button><span class="small">After an agent answers a prompt from the research folder, paste its whole reply into a new .md file in research/results, then check it here.</span></div>
+    ${research ? `<div class="small" style="white-space:pre-wrap">${esc(research.lines.join("\n"))}</div>${research.empty ? "" : `<div class="row"><button class="btn primary" onclick="researchApply()">Apply these changes</button><button class="btn" onclick="research=null;tab('app')">Cancel</button></div>`}` : ""}${msgSlot("research")}</div>
+    <div class="box"><h4>Sidekick</h4><div>Version ${esc(a.commit || "unknown")}</div>${upd}</div>
+    <div class="box"><h4>Shortcuts and folders</h4><div class="row"><button class="btn" onclick="makeShortcut()">${a.shortcut ? "Remake" : "Add"} Desktop and Start menu shortcuts</button>${a.shortcut ? `<span class="saved">Shortcuts are there.</span>` : ""}</div>
+    <div class="row"><button class="btn" onclick="api('open', {what: 'reports'})">Open saved reports</button><button class="btn" onclick="api('open', {what: 'log'})">Open the log folder</button></div>${msgSlot("shortcut")}</div>`;
+}
+let research = null;
+async function researchPlan() { research = await api("research_plan"); if (research.error) { flash("research", research.error, true); research = null; } tab("app"); }
+async function researchApply() {
+  const r = await api("research_apply"); research = null;
+  SAVE_MSG.research = r.error ? {text: r.error, bad: true} : {text: "Done: " + r.done.join("; "), bad: false};
+  tab("app");
+}
+async function setResearchReminders(on) {
+  const r = await api("set_research_reminders", {on});
+  SAVE_MSG.research = r.error ? {text: r.error, bad: true} : {text: on ? "On." : "Off.", bad: false};
+  await loadSettings();
+}
+async function setCollect(on) {
+  const r = await api("set_collect", {on});
+  SAVE_MSG.collect = r.error ? {text: r.error, bad: true} : {text: on ? "On." : "Off.", bad: false};
+  await loadSettings();
+}
+async function openUpdate() { current = "app"; await openSettings(); checkUpdate(); }
+async function openResearch() { current = "app"; await openSettings(); }
+async function refreshData() { const r = await api("refresh"); flash("refresh", r.error || "Refreshing (progress at the top)...", !!r.error); }
+async function checkUpdate() { update = {checking: true}; tab("app"); update = await api("check_update"); tab("app"); }
+async function doUpdate() { const r = await api("update"); if (r.error) { update = {error: r.error}; tab("app"); } else closeSettings(); }
+async function makeShortcut() { const r = await api("shortcut"); if (r.error) flash("shortcut", r.error, true); else { SAVE_MSG.shortcut = {text: "Made: " + r.made.join(", "), bad: false}; await loadSettings(); } }
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeSettings(); closeTeams(); closeChamps(); closeHistory(); } });
+
+// ---- the Both teams panel (M17): every champion in Riot's and the wiki's words
+function openTeams() { renderTeams(); document.getElementById("teams").className = "on"; }
+function closeTeams() { document.getElementById("teams").className = ""; }
+
+// ---- History (M23): past games, saved on this PC only
+let past = null, pastGames = null;
+function when(at) { const d = new Date(at); return isNaN(d) ? esc(at) : d.toLocaleDateString(undefined, {month: "short", day: "numeric"}) + ", " + d.toLocaleTimeString(undefined, {hour: "numeric", minute: "2-digit"}); }
+function checked(pg) { return pg ? `<span class="badge ${pg.hits * 2 >= pg.graded ? "b-us" : "b-them"}" title="After the game: how many of the report's calls came true">${pg.hits} of ${pg.graded} right</span>` : `<span class="small">not checked</span>`; }
+async function openHistory() {
+  const r = await api("history");
+  pastGames = r.error ? {games: [], accounts: [], account: ""} : r;
+  const sel = document.getElementById("histacct");
+  const accts = pastGames.accounts || [];
+  sel.hidden = accts.length < 2;
+  sel.innerHTML = `<option value="">Every account</option>` + accts.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join("");
+  drawHistory();
+  document.getElementById("history").className = "on";
+}
+function closeHistory() { document.getElementById("history").className = ""; }
+function drawHistory() {
+  const acct = document.getElementById("histacct").value;
+  const games = (pastGames.games || []).filter(g => !acct || g.account === acct);
+  document.getElementById("histlist").innerHTML = games.length ? games.map(g =>
+    `<div class="hrow" onclick="showPast('${esc(g.id)}')"><span class="when">${when(g.at)}</span>${pic(g.champion_id, "s")}<span class="who"><b>${esc(g.champion)}</b> <span class="small">${esc(g.role)}${g.opponents.length ? " vs " + esc(g.opponents.map(o => o.name).join(" + ")) : ""}</span>${g.account && !acct ? ` <span class="acct">${esc(g.account)}</span>` : ""}</span>${g.kind === "text" ? `<span class="small">report text</span>` : g.written ? `<span class="small">written</span>` : ""}${checked(g.postgame)}</div>`).join("")
+    : `<div class="small">No games yet. Each game's final report is saved here when the loading screen ends; nothing is sent anywhere.</div>`;
+}
+async function showPast(id) {
+  const r = await api("history_game", {id});
+  if (r.error) { document.getElementById("histlist").insertAdjacentHTML("afterbegin", `<div class="small" style="color:var(--them)">${esc(r.error)}</div>`); return; }
+  past = r; closeHistory(); render();
+}
+function backToNow() { past = null; render(); }
+function renderPast(g) {
+  const bar = `<div class="pastbar"><b>Past game</b><span class="grow">${when(g.at)}${g.account ? " - " + esc(g.account) : ""}</span>${checked(g.postgame)}<button class="btn" onclick="openHistory()">History</button><button class="btn primary" onclick="backToNow()">Back to now</button></div>`;
+  const marks = {y: "right", n: "wrong", "": "not checkable"};
+  const results = (g.results || []).length ? card("After the game", `<ul class="hres">${g.results.map(r => `<li class="${esc(r.hit)}"><b>${esc(r.kind.replace(/_/g, " "))}${r.lane ? " (" + esc(r.lane) + ")" : ""}</b>: said ${esc(r.predicted)}, ${esc(marks[r.hit] || "")}${r.measure ? " - " + esc(r.measure) : ""}</li>`).join("")}</ul>`) : "";
+  if (g.kind === "text") return bar + results + `<div class="reporttext">${esc(g.text)}</div>`;
+  return bar + renderReport(g.view) + results;
+}
+function renderTeams() {
+  const kits = ((past && past.view) || view || {}).kits || [];
+  const order = ["top", "jungle", "mid", "bot", "support"];
+  const block = k => `<div class="champ2"><div class="hd">${pic(k.id, "m")}<div><span class="nm">${esc(k.name)}</span> <span class="small">${esc(k.role)}${k.classes.length ? " - " + esc(k.classes.join(", ").replace(/_/g, " ")) : ""}${k.range ? " - " + esc(k.range) : ""}</span><div class="chips" style="margin-top:3px">${k.ratings.map(r => `<span class="lvl ${r.level}">${esc(r.name)} ${esc(r.level)}</span>`).join("")}</div></div></div>` +
+    (k.mechanics.length ? `<div class="chips" style="margin-bottom:4px">${k.mechanics.map(m => `<span class="chip">${esc(m.replace(/_/g, " "))}</span>`).join("")}</div>` : "") +
+    (k.off_role ? `<div class="small" style="color:var(--warn)">Rarely played ${esc(k.role)}: no data for this pick here.</div>` : "") +
+    ((k.measured || []).length ? `<div class="riot">${esc(k.measured_source)}</div>` + list(k.measured) : "") +
+    ((k.measured_changes || []).length ? `<div class="riot" style="color:var(--warn)">Changed since last patch</div>` + list(k.measured_changes) : "") +
+    k.abilities.map(a => `<div class="ab"><b>${a.slot === "P" ? "Passive" : esc(a.slot)} ${esc(a.name)}</b>: ${esc(a.text)}</div>`).join("") +
+    (k.tips.length ? `<div class="riot" style="margin-top:5px">Riot's tips ${k.tips_kind === "against" ? "against them" : "for playing it"}</div>` + list(k.tips) : "") + `</div>`;
+  const col = (side, title) => `<div class="col"><h3 style="color:var(--${side})">${title}</h3>${kits.filter(k => k.side === side).sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role)).map(block).join("")}</div>`;
+  document.getElementById("teamcols").innerHTML = col("us", "YOUR TEAM") + col("them", "THEIR TEAM");
+}
+
+async function poll() {
+  try {
+    if (window.pywebview && window.pywebview.api) {
+      const r = await window.pywebview.api.poll(version);
+      if (r && r.version !== version) { version = r.version; if (r.view) { view = r.view; if (past && view.screen !== "status") past = null; render(); } }
+      if (r && r.message !== undefined && !(view && view.screen === "status" && view.state === "problem")) document.getElementById("msg").textContent = r.message;
+      if (r) showMeta(r.meta);
+    }
+  } catch (e) {}
+  setTimeout(poll, 400);
+}
+render(); poll();
+</script>
+</body>
+</html>

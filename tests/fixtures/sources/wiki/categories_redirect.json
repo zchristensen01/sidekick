@@ -1,0 +1,250 @@
+{
+ "batchcomplete": "",
+ "query": {
+  "redirects": [
+   {
+    "from": "Nunu & Willump",
+    "to": "Nunu"
+   }
+  ],
+  "pages": {
+   "1353391": {
+    "pageid": 1353391,
+    "ns": 0,
+    "title": "Kai'Sa",
+    "categories": [
+     {
+      "ns": 14,
+      "title": "Category:2018 release"
+     },
+     {
+      "ns": 14,
+      "title": "Category:585 RP champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:675 BE champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Adaptive magic champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Bottom champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Champion gameplay article"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Champions with map-specific balancing"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Champions with strategy information"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Dash champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Debug"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Execution champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Haste champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Kai'Sa"
+     },
+     {
+      "ns": 14,
+      "title": "Category:League of Legends champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Mage champion (Legacy)"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Mana champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Map specific balancing"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Marksman champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Marksman champion (Legacy)"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Pending for test"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Pending for test/League of Legends"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Ranged champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Shield champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Stealth champion"
+     }
+    ]
+   },
+   "2043": {
+    "pageid": 2043,
+    "ns": 0,
+    "title": "Nunu",
+    "categories": [
+     {
+      "ns": 14,
+      "title": "Category:2009 release"
+     },
+     {
+      "ns": 14,
+      "title": "Category:225 BE champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:260 RP champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Adaptive magic champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Champion gameplay article"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Champions with map-specific balancing"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Cleanse champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Debug"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Debug2"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Haste champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Immune champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Jungle champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Knockup champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:League of Legends champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Mage champion (Legacy)"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Mana champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Map specific balancing"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Melee champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Nunu"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Pages using DynamicPageList4"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Pages using DynamicPageList4 dplreplace parser function"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Pages using DynamicPageList4 parser function"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Pull champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Root champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Self Crowd Control champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Self Heal champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Shield champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Slow champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Stun champion"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Tank champion (Legacy)"
+     },
+     {
+      "ns": 14,
+      "title": "Category:Vanguard champion"
+     }
+    ]
+   }
+  }
+ },
+ "limits": {
+  "categories": 500
+ }
+}

@@ -1,0 +1,336 @@
+{
+ "type": "item",
+ "version": "16.19.1",
+ "data": {
+  "1001": {
+   "name": "Boots",
+   "colloq": ";",
+   "plaintext": "Slightly increases Move Speed",
+   "into": [
+    "3005",
+    "3047",
+    "3008",
+    "3006",
+    "3009",
+    "3010",
+    "3020",
+    "3111",
+    "3117",
+    "3158"
+   ],
+   "image": {
+    "full": "1001.png",
+    "sprite": "item0.png",
+    "group": "item",
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 300,
+    "purchasable": true,
+    "total": 300,
+    "sell": 210
+   },
+   "tags": [
+    "Boots"
+   ],
+   "maps": {
+    "11": true,
+    "12": true,
+    "22": false,
+    "30": false,
+    "453": true
+   },
+   "stats": {
+    "FlatMovementSpeedMod": 25
+   }
+  },
+  "1055": {
+   "name": "Doran's Blade",
+   "colloq": ";dblade",
+   "plaintext": "Good starting item for attackers",
+   "image": {
+    "full": "1055.png",
+    "sprite": "item0.png",
+    "group": "item",
+    "x": 96,
+    "y": 96,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 450,
+    "purchasable": true,
+    "total": 450,
+    "sell": 180
+   },
+   "tags": [
+    "Health",
+    "Damage",
+    "LifeSteal",
+    "SpellVamp",
+    "Lane"
+   ],
+   "maps": {
+    "11": true,
+    "12": true,
+    "22": false,
+    "30": false,
+    "453": true
+   },
+   "stats": {
+    "FlatHPPoolMod": 80,
+    "FlatPhysicalDamageMod": 10
+   }
+  },
+  "2003": {
+   "name": "Health Potion",
+   "colloq": ";",
+   "plaintext": "Consume to restore Health over time",
+   "stacks": 5,
+   "consumed": true,
+   "image": {
+    "full": "2003.png",
+    "sprite": "item0.png",
+    "group": "item",
+    "x": 288,
+    "y": 384,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 50,
+    "purchasable": true,
+    "total": 50,
+    "sell": 20
+   },
+   "tags": [
+    "HealthRegen",
+    "Consumable",
+    "Lane",
+    "Jungle"
+   ],
+   "maps": {
+    "11": true,
+    "12": true,
+    "22": false,
+    "30": false,
+    "453": true
+   },
+   "stats": {}
+  },
+  "3071": {
+   "name": "Black Cleaver",
+   "colloq": ";bc",
+   "plaintext": "Dealing physical damage to enemy champions reduces their Armor",
+   "from": [
+    "3044",
+    "3067",
+    "1037"
+   ],
+   "image": {
+    "full": "3071.png",
+    "sprite": "item3.png",
+    "group": "item",
+    "x": 96,
+    "y": 240,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 225,
+    "purchasable": true,
+    "total": 3000,
+    "sell": 2100
+   },
+   "tags": [
+    "Health",
+    "Damage",
+    "CooldownReduction",
+    "OnHit",
+    "NonbootsMovement",
+    "ArmorPenetration",
+    "AbilityHaste"
+   ],
+   "maps": {
+    "11": true,
+    "12": true,
+    "22": false,
+    "30": false,
+    "453": true
+   },
+   "stats": {
+    "FlatHPPoolMod": 400,
+    "FlatPhysicalDamageMod": 45
+   },
+   "depth": 3
+  },
+  "3157": {
+   "name": "Zhonya's Hourglass",
+   "colloq": ";zhg;zonyas",
+   "plaintext": "Activate to become invincible but unable to take actions",
+   "from": [
+    "1058",
+    "2420"
+   ],
+   "image": {
+    "full": "3157.png",
+    "sprite": "item4.png",
+    "group": "item",
+    "x": 336,
+    "y": 0,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 450,
+    "purchasable": true,
+    "total": 3250,
+    "sell": 2275
+   },
+   "tags": [
+    "Armor",
+    "SpellDamage",
+    "Active"
+   ],
+   "maps": {
+    "11": true,
+    "12": true,
+    "22": false,
+    "30": false,
+    "453": true
+   },
+   "stats": {
+    "FlatMagicDamageMod": 105,
+    "FlatArmorMod": 50
+   },
+   "effect": {
+    "Effect1Amount": "0",
+    "Effect2Amount": "2.5",
+    "Effect3Amount": "120"
+   },
+   "depth": 3
+  },
+  "6672": {
+   "name": "Kraken Slayer",
+   "colloq": "",
+   "plaintext": "",
+   "from": [
+    "6690",
+    "3051",
+    "1043"
+   ],
+   "image": {
+    "full": "6672.png",
+    "sprite": "item6.png",
+    "group": "item",
+    "x": 144,
+    "y": 96,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 325,
+    "purchasable": true,
+    "total": 3000,
+    "sell": 2100
+   },
+   "tags": [
+    "Damage",
+    "AttackSpeed",
+    "OnHit",
+    "NonbootsMovement"
+   ],
+   "maps": {
+    "11": true,
+    "12": true,
+    "22": false,
+    "30": false,
+    "453": true
+   },
+   "stats": {
+    "FlatPhysicalDamageMod": 45,
+    "PercentAttackSpeedMod": 0.4,
+    "PercentMovementSpeedMod": 0.04
+   },
+   "depth": 3
+  },
+  "1035": {
+   "name": "Emberknife",
+   "colloq": "",
+   "plaintext": "",
+   "inStore": false,
+   "image": {
+    "full": "1035.png",
+    "sprite": "item0.png",
+    "group": "item",
+    "x": 48,
+    "y": 48,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 350,
+    "purchasable": false,
+    "total": 350,
+    "sell": 140
+   },
+   "tags": [
+    "LifeSteal",
+    "SpellVamp",
+    "Jungle"
+   ],
+   "maps": {
+    "11": false,
+    "12": false,
+    "22": false,
+    "30": false,
+    "453": false
+   },
+   "stats": {},
+   "effect": {
+    "Effect1Amount": "60",
+    "Effect2Amount": "25",
+    "Effect3Amount": "5",
+    "Effect4Amount": "8"
+   }
+  },
+  "1501": {
+   "name": "Fortification",
+   "colloq": "",
+   "plaintext": "",
+   "inStore": false,
+   "image": {
+    "full": "1501.png",
+    "sprite": "item0.png",
+    "group": "item",
+    "x": 96,
+    "y": 288,
+    "w": 48,
+    "h": 48
+   },
+   "gold": {
+    "base": 0,
+    "purchasable": false,
+    "total": 0,
+    "sell": 0
+   },
+   "tags": [],
+   "maps": {
+    "11": true,
+    "12": true,
+    "22": false,
+    "30": true,
+    "453": true
+   },
+   "stats": {},
+   "effect": {
+    "Effect1Amount": "0",
+    "Effect2Amount": "0",
+    "Effect3Amount": "0.35"
+   }
+  }
+ }
+}

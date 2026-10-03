@@ -1,0 +1,7 @@
+# Expected report shape (docs/RULES.md, Tests). Update on purpose.
+game: samira_naut
+role: support
+sections: [your_lane, counterpick, punish, roams, jungle, protect_or_engage, watch_out, dont_feed, game_plan]
+fired: [BOT-KILL-LANE-THEM, COUNTER-HARD, JG-BOTSIDE-FIGHTS-THEM, JG-ENEMY-GANKER, LANE-LOSING, LANER-ASK-GANK,
+  SUP-ENEMY-ROAMER, SUP-PEEL-JOB, SYN-AIRBORNE, TEAM-THEIR-ENGAGE, TEAM-THEY-EARLY]
+not_fired: [LANE-WINNING, BOT-KILL-LANE-US, JG-STRONGER-US, JG-STRONGER-ENEMY, TEAM-WE-SCALE]

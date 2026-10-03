@@ -1,0 +1,170 @@
+{
+  "_note": "Requests that produced each fixture. Endpoint https://mcp-api.op.gg/mcp (Streamable HTTP, protocolVersion 2025-06-18), captured 2026-10-02. Each call ran in a fresh session: initialize -> notifications/initialized -> request.",
+  "initialize.json": {
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2025-06-18",
+      "capabilities": {},
+      "clientInfo": {
+        "name": "lol-scout-fixture-capture",
+        "version": "0.1"
+      }
+    }
+  },
+  "tools_list.json": {
+    "method": "tools/list",
+    "params": {}
+  },
+  "lane_meta_jungle.json": {
+    "method": "tools/call",
+    "tool": "lol_list_lane_meta_champions",
+    "arguments": {
+      "position": "jungle",
+      "desired_output_fields": [
+        "data.positions.jungle[].{ban_rate,champion,is_rip,kda,kill,pick_rate,play,rank,rank_prev,rank_prev_patch,role_rate,tier,win,win_rate}",
+        "lang",
+        "position_filter"
+      ]
+    }
+  },
+  "lane_meta_all.json": {
+    "method": "tools/call",
+    "tool": "lol_list_lane_meta_champions",
+    "arguments": {
+      "position": "all",
+      "desired_output_fields": [
+        "data.positions.top[].{ban_rate,champion,is_rip,kda,kill,pick_rate,play,rank,rank_prev,rank_prev_patch,role_rate,tier,win,win_rate}",
+        "data.positions.jungle[].{ban_rate,champion,is_rip,kda,kill,pick_rate,play,rank,rank_prev,rank_prev_patch,role_rate,tier,win,win_rate}",
+        "data.positions.mid[].{ban_rate,champion,is_rip,kda,kill,pick_rate,play,rank,rank_prev,rank_prev_patch,role_rate,tier,win,win_rate}",
+        "data.positions.adc[].{ban_rate,champion,is_rip,kda,kill,pick_rate,play,rank,rank_prev,rank_prev_patch,role_rate,tier,win,win_rate}",
+        "data.positions.support[].{ban_rate,champion,is_rip,kda,kill,pick_rate,play,rank,rank_prev,rank_prev_patch,role_rate,tier,win,win_rate}",
+        "lang",
+        "position_filter"
+      ]
+    }
+  },
+  "champion_analysis_LeeSin_jungle.json": {
+    "method": "tools/call",
+    "tool": "lol_get_champion_analysis",
+    "arguments": {
+      "game_mode": "ranked",
+      "champion": "LEE_SIN",
+      "position": "jungle",
+      "desired_output_fields": [
+        "champion",
+        "position",
+        "data.summary.{id,is_rip,is_rotation,roles}",
+        "data.summary.average_stats.{ban_rate,kda,pick_rate,play,rank,tier,win_rate}",
+        "data.summary.average_stats.tier_data.{rank,rank_prev,rank_prev_patch,tier}",
+        "data.summary.positions[].name",
+        "data.summary.positions[].stats.{ban_rate,kda,pick_rate,play,role_rate,win_rate}",
+        "data.summary.positions[].stats.tier_data.{rank,rank_prev,rank_prev_patch,tier}",
+        "data.summary.positions[].roles[].name",
+        "data.summary.positions[].roles[].stats.{play,role_rate,win,win_rate}",
+        "data.summary.positions[].counters[].{champion_id,champion_name,play,win}",
+        "data.strong_counters[].{champion_id,champion_name,counter_win_rate,my_win_rate,play,win,win_rate}",
+        "data.weak_counters[].{champion_id,champion_name,counter_win_rate,my_win_rate,play,win,win_rate}",
+        "data.trends.ban.{created_at,rank,rate,version}",
+        "data.trends.pick.{created_at,rank,rate,version}",
+        "data.trends.win.{created_at,rank,rate,version}",
+        "data.trends.{total_position_rank,total_rank}",
+        "data.{damage_type,mythic_items}",
+        "data.skill_combos[].{name,video_url}",
+        "data.skill_masteries.{ids[],pick_rate,play,win}",
+        "data.summoner_spells.{ids[],ids_names[],pick_rate,play,win}",
+        "data.synergies.adc[].{champion_id,champion_name,play,position,score,score_rank,synergy_champion_id,synergy_champion_name,synergy_position,win,win_rate}",
+        "data.synergies.mid[].{champion_id,champion_name,play,position,score,score_rank,synergy_champion_id,synergy_champion_name,synergy_position,win,win_rate}",
+        "data.synergies.support[].{champion_id,champion_name,play,position,score,score_rank,synergy_champion_id,synergy_champion_name,synergy_position,win,win_rate}"
+      ]
+    }
+  },
+  "champion_analysis_LeeSin_jungle_allfields.json": {
+    "method": "tools/call",
+    "tool": "lol_get_champion_analysis",
+    "arguments": {
+      "game_mode": "ranked",
+      "champion": "LEE_SIN",
+      "position": "jungle"
+    }
+  },
+  "champion_analysis_LeeSin_jungle_challenger.json": {
+    "method": "tools/call",
+    "tool": "lol_get_champion_analysis",
+    "arguments": {
+      "game_mode": "ranked",
+      "champion": "LEE_SIN",
+      "position": "jungle",
+      "tier": "challenger",
+      "desired_output_fields": [
+        "champion",
+        "position",
+        "data.summary.average_stats.{ban_rate,kda,pick_rate,play,rank,tier,win_rate}",
+        "data.summary.positions[].name",
+        "data.summary.positions[].stats.{ban_rate,kda,pick_rate,play,role_rate,win_rate}",
+        "data.weak_counters[].{champion_id,champion_name,counter_win_rate,my_win_rate,play,win,win_rate}"
+      ]
+    }
+  },
+  "champion_analysis_MonkeyKing_jungle.json": {
+    "method": "tools/call",
+    "tool": "lol_get_champion_analysis",
+    "arguments": {
+      "game_mode": "ranked",
+      "champion": "MONKEY_KING",
+      "position": "jungle",
+      "desired_output_fields": [
+        "champion",
+        "position",
+        "data.summary.average_stats.{ban_rate,kda,pick_rate,play,rank,tier,win_rate}",
+        "data.summary.positions[].name",
+        "data.summary.positions[].stats.{ban_rate,kda,pick_rate,play,role_rate,win_rate}",
+        "data.weak_counters[].{champion_id,champion_name,counter_win_rate,my_win_rate,play,win,win_rate}"
+      ]
+    }
+  },
+  "lane_matchup_guide_LeeSin_vs_Elise_jungle.json": {
+    "method": "tools/call",
+    "tool": "lol_get_lane_matchup_guide",
+    "arguments": {
+      "position": "jungle",
+      "my_champion": "LEE_SIN",
+      "opponent_champion": "ELISE"
+    }
+  },
+  "champion_synergies_Samira_bot.json": {
+    "method": "tools/call",
+    "tool": "lol_get_champion_synergies",
+    "arguments": {
+      "champion": "SAMIRA",
+      "my_position": "adc",
+      "synergy_position": "support",
+      "desired_output_fields": [
+        "champion",
+        "my_position",
+        "synergy_position",
+        "lang",
+        "data.synergies[].{champion_id,champion_name,play,position,score,score_rank,synergy_champion_id,synergy_champion_name,synergy_position,win,win_rate}",
+        "data.synergies[].synergy_tier_data.{rank,rank_prev,rank_prev_patch,tier}"
+      ]
+    }
+  },
+  "list_champions.json": {
+    "method": "tools/call",
+    "tool": "lol_list_champions",
+    "arguments": {
+      "desired_output_fields": [
+        "data.champions[].{champion_id,key,name,release_date}",
+        "lang"
+      ]
+    }
+  },
+  "error_unknown_champion.json": {
+    "method": "tools/call",
+    "tool": "lol_get_lane_matchup_guide",
+    "arguments": {
+      "position": "jungle",
+      "my_champion": "NOT_A_CHAMP",
+      "opponent_champion": "ELISE"
+    }
+  }
+}

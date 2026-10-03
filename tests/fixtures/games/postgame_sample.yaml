@@ -1,0 +1,24 @@
+# Game fixture (format: tests/fixtures/README.md). The draft of the made-up match in
+# tests/fixtures/postgame/, for the post-game check (M10).
+name: postgame_sample
+description: >
+  Red-side Jax jungle into Ambessa; Ezreal/Milio into Miss Fortune/Gragas. The match fixture
+  says red lost a 26-minute game.
+ddragon_version: "16.19.1"
+queue: ranked_solo
+side: red
+my_role: jungle
+ally:
+  top: Garen
+  jungle: Jax
+  mid: Neeko
+  bot: Ezreal
+  support: Milio
+enemy:
+  top: Camille
+  jungle: Ambessa
+  mid: Karma
+  bot: MissFortune
+  support: Gragas
+pick_turns: {}
+enemy_role_confidence: {}

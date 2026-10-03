@@ -1,0 +1,173 @@
+{
+ "parse": {
+  "title": "V26.10",
+  "pageid": 1727899,
+  "sections": [
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "New Cosmetics",
+    "number": "1",
+    "index": "1",
+    "fromtitle": "V26.10",
+    "byteoffset": 543,
+    "anchor": "New_Cosmetics",
+    "linkAnchor": "New_Cosmetics"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "League of Legends V26.10",
+    "number": "2",
+    "index": "2",
+    "fromtitle": "V26.10",
+    "byteoffset": 824,
+    "anchor": "League_of_Legends_V26.10",
+    "linkAnchor": "League_of_Legends_V26.10"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Client",
+    "number": "2.1",
+    "index": "3",
+    "fromtitle": "V26.10",
+    "byteoffset": 855,
+    "anchor": "Client",
+    "linkAnchor": "Client"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Game",
+    "number": "2.2",
+    "index": "4",
+    "fromtitle": "V26.10",
+    "byteoffset": 1226,
+    "anchor": "Game",
+    "linkAnchor": "Game"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Champions",
+    "number": "2.3",
+    "index": "5",
+    "fromtitle": "V26.10",
+    "byteoffset": 3690,
+    "anchor": "Champions",
+    "linkAnchor": "Champions"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Items",
+    "number": "2.4",
+    "index": "6",
+    "fromtitle": "V26.10",
+    "byteoffset": 12221,
+    "anchor": "Items",
+    "linkAnchor": "Items"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Runes",
+    "number": "2.5",
+    "index": "7",
+    "fromtitle": "V26.10",
+    "byteoffset": 13794,
+    "anchor": "Runes",
+    "linkAnchor": "Runes"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Neutral buffs",
+    "number": "2.6",
+    "index": "8",
+    "fromtitle": "V26.10",
+    "byteoffset": 14090,
+    "anchor": "Neutral_buffs",
+    "linkAnchor": "Neutral_buffs"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "ARAM",
+    "number": "2.7",
+    "index": "9",
+    "fromtitle": "V26.10",
+    "byteoffset": 14279,
+    "anchor": "ARAM",
+    "linkAnchor": "ARAM"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "ARAM: Mayhem",
+    "number": "2.8",
+    "index": "10",
+    "fromtitle": "V26.10",
+    "byteoffset": 14854,
+    "anchor": "ARAM:_Mayhem",
+    "linkAnchor": "ARAM:_Mayhem"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Arena",
+    "number": "2.9",
+    "index": "11",
+    "fromtitle": "V26.10",
+    "byteoffset": 17021,
+    "anchor": "Arena",
+    "linkAnchor": "Arena"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "Hotfixes",
+    "number": "3",
+    "index": "12",
+    "fromtitle": "V26.10",
+    "byteoffset": 22766,
+    "anchor": "Hotfixes",
+    "linkAnchor": "Hotfixes"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "May 14th Hotfix",
+    "number": "3.1",
+    "index": "13",
+    "fromtitle": "V26.10",
+    "byteoffset": 22781,
+    "anchor": "May_14th_Hotfix",
+    "linkAnchor": "May_14th_Hotfix"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "References",
+    "number": "4",
+    "index": "",
+    "byteoffset": null,
+    "anchor": "References",
+    "linkAnchor": "References"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "See Also",
+    "number": "5",
+    "index": "14",
+    "fromtitle": "V26.10",
+    "byteoffset": 23725,
+    "anchor": "See_Also",
+    "linkAnchor": "See_Also"
+   }
+  ],
+  "showtoc": ""
+ }
+}

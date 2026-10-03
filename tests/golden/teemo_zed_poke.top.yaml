@@ -1,0 +1,7 @@
+# Expected report shape (docs/RULES.md, Tests). Update on purpose.
+game: teemo_zed_poke
+role: top
+sections: [your_lane, counterpick, punish, jungle, map_threats, your_job, dont_feed, game_plan]
+fired: [JG-TOPSIDE-FIGHTS-US, LANE-ENEMY-JG-FARMER, LANER-ASK-COVER, MAP-ULT-JOIN-US,
+  SIDE-LANE-MID-ROAMER, TOP-RANGED-INTO-US]
+not_fired: [LANE-LOSING, TOP-US-RANGED, JG-STRONGER-ENEMY, JG-ENEMY-GANKER]

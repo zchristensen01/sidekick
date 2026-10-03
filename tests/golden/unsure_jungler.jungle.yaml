@@ -1,0 +1,7 @@
+# Expected report shape (docs/RULES.md, Tests). Update on purpose.
+game: unsure_jungler
+role: jungle
+sections: [gank_first, lanes_in_trouble, enemy_jungler, start_objectives, counterpick, watch_out, dont_feed, game_plan]
+fired: [CHAMP-SNOWBALL, JG-ENEMY-GANKER, JG-GANK-TARGET, JG-LANE-ASKS-GANK, LANE-COINFLIP, LANE-LOSING,
+  TEAM-THEY-EARLY, TEAM-WE-SCALE]
+not_fired: [JG-STRONGER-ENEMY, LANE-WINNING, TOP-RANGED-INTO-US]

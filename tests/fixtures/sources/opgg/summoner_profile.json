@@ -1,0 +1,13 @@
+{
+ "jsonrpc": "2.0",
+ "id": 1,
+ "result": {
+  "content": [
+   {
+    "type": "text",
+    "text": "class LolGetSummonerProfile: data\nclass Data: summoner\nclass Summoner: league_stats,ranked_most_champions,recent_champion_stats\nclass LeagueStat: game_type,tier_info,win,lose\nclass TierInfo: tier,division,lp\nclass RankedMostChampions: my_champion_stats\nclass MyChampionStat: id,play,win,lose,basic,champion_name\nclass Basic: kill,death,assist\nclass RecentChampionStat: id,play,win,kill,death,assist,champion_name\n\nLolGetSummonerProfile(Data(Summoner([LeagueStat(\"SOLORANKED\",TierInfo(\"PLATINUM\",3,41),64,58),LeagueStat(\"FLEXRANKED\",TierInfo(null,null,null),null,null),LeagueStat(\"ARENA\",TierInfo(null,null,null),null,null)],RankedMostChampions([MyChampionStat(75,31,17,14,Basic(212,180,301),\"Nasus\"),MyChampionStat(86,22,12,10,Basic(140,118,160),\"Garen\"),MyChampionStat(122,15,7,8,Basic(98,101,77),\"Darius\"),MyChampionStat(54,9,5,4,Basic(30,41,88),\"Malphite\"),MyChampionStat(14,6,2,4,Basic(25,33,40),\"Sion\"),MyChampionStat(516,4,3,1,Basic(12,15,30),\"Ornn\"),MyChampionStat(36,3,1,2,Basic(9,14,21),\"Dr. Mundo\")]),[RecentChampionStat(75,8,5,26,35,61,\"Nasus\"),RecentChampionStat(86,6,2,19,30,25,\"Garen\"),RecentChampionStat(122,2,1,8,9,6,\"Darius\")])))"
+   }
+  ],
+  "isError": false
+ }
+}

@@ -1,0 +1,325 @@
+{
+ "batchcomplete": "",
+ "limits": {
+  "categorymembers": 500
+ },
+ "query": {
+  "categorymembers": [
+   {
+    "pageid": 1518672,
+    "ns": 14,
+    "title": "Category:Berserk champion"
+   },
+   {
+    "pageid": 976741,
+    "ns": 14,
+    "title": "Category:Blind champion"
+   },
+   {
+    "pageid": 976742,
+    "ns": 14,
+    "title": "Category:Blink champion"
+   },
+   {
+    "pageid": 976743,
+    "ns": 14,
+    "title": "Category:Blocker champion"
+   },
+   {
+    "pageid": 1529410,
+    "ns": 14,
+    "title": "Category:Champion with infinite scaling"
+   },
+   {
+    "pageid": 1330185,
+    "ns": 14,
+    "title": "Category:Champion without ability power ratio"
+   },
+   {
+    "pageid": 1338991,
+    "ns": 14,
+    "title": "Category:Champions with altered base attack speed at level 1"
+   },
+   {
+    "pageid": 1339012,
+    "ns": 14,
+    "title": "Category:Champions with critical strike ratios"
+   },
+   {
+    "pageid": 1416821,
+    "ns": 14,
+    "title": "Category:Champions with map-specific balancing"
+   },
+   {
+    "pageid": 1411089,
+    "ns": 14,
+    "title": "Category:Champions with modified base critical strike damage"
+   },
+   {
+    "pageid": 1695166,
+    "ns": 14,
+    "title": "Category:Champions with specific interaction hotkeys"
+   },
+   {
+    "pageid": 1416822,
+    "ns": 14,
+    "title": "Category:Champions with strategy information"
+   },
+   {
+    "pageid": 1344773,
+    "ns": 14,
+    "title": "Category:Charm champion"
+   },
+   {
+    "pageid": 1456677,
+    "ns": 14,
+    "title": "Category:Cleanse champion"
+   },
+   {
+    "pageid": 976745,
+    "ns": 14,
+    "title": "Category:Cooldown champion"
+   },
+   {
+    "pageid": 1344768,
+    "ns": 14,
+    "title": "Category:Cripple champion"
+   },
+   {
+    "pageid": 976747,
+    "ns": 14,
+    "title": "Category:Dash champion"
+   },
+   {
+    "pageid": 1131624,
+    "ns": 14,
+    "title": "Category:Decoy champion"
+   },
+   {
+    "pageid": 1344770,
+    "ns": 14,
+    "title": "Category:Disarm champion"
+   },
+   {
+    "pageid": 1344774,
+    "ns": 14,
+    "title": "Category:Disrupt champion"
+   },
+   {
+    "pageid": 1450756,
+    "ns": 14,
+    "title": "Category:Drowsy champion"
+   },
+   {
+    "pageid": 976749,
+    "ns": 14,
+    "title": "Category:Energy champion"
+   },
+   {
+    "pageid": 976750,
+    "ns": 14,
+    "title": "Category:Execution champion"
+   },
+   {
+    "pageid": 1110875,
+    "ns": 14,
+    "title": "Category:Flee champion"
+   },
+   {
+    "pageid": 976752,
+    "ns": 14,
+    "title": "Category:Fury champion"
+   },
+   {
+    "pageid": 976753,
+    "ns": 14,
+    "title": "Category:Global champion"
+   },
+   {
+    "pageid": 1344772,
+    "ns": 14,
+    "title": "Category:Ground champion"
+   },
+   {
+    "pageid": 976754,
+    "ns": 14,
+    "title": "Category:Haste champion"
+   },
+   {
+    "pageid": 976755,
+    "ns": 14,
+    "title": "Category:Healer champion"
+   },
+   {
+    "pageid": 976757,
+    "ns": 14,
+    "title": "Category:Health champion"
+   },
+   {
+    "pageid": 1459294,
+    "ns": 14,
+    "title": "Category:Immune champion"
+   },
+   {
+    "pageid": 1459282,
+    "ns": 14,
+    "title": "Category:Invulnerable champion"
+   },
+   {
+    "pageid": 1482512,
+    "ns": 14,
+    "title": "Category:Kinematics champion"
+   },
+   {
+    "pageid": 1344775,
+    "ns": 14,
+    "title": "Category:Knock aside champion"
+   },
+   {
+    "pageid": 976759,
+    "ns": 14,
+    "title": "Category:Knockback champion"
+   },
+   {
+    "pageid": 1344778,
+    "ns": 14,
+    "title": "Category:Knockdown champion"
+   },
+   {
+    "pageid": 976760,
+    "ns": 14,
+    "title": "Category:Knockup champion"
+   },
+   {
+    "pageid": 1503548,
+    "ns": 14,
+    "title": "Category:Mana champion"
+   },
+   {
+    "pageid": 976761,
+    "ns": 14,
+    "title": "Category:Mana Heal champion"
+   },
+   {
+    "pageid": 1482518,
+    "ns": 14,
+    "title": "Category:Manaless champion"
+   },
+   {
+    "pageid": 976293,
+    "ns": 14,
+    "title": "Category:Melee champion"
+   },
+   {
+    "pageid": 1344779,
+    "ns": 14,
+    "title": "Category:Nearsight champion"
+   },
+   {
+    "pageid": 976762,
+    "ns": 14,
+    "title": "Category:Pet champion"
+   },
+   {
+    "pageid": 1131622,
+    "ns": 14,
+    "title": "Category:Polymorph champion"
+   },
+   {
+    "pageid": 976763,
+    "ns": 14,
+    "title": "Category:Pull champion"
+   },
+   {
+    "pageid": 976295,
+    "ns": 14,
+    "title": "Category:Ranged champion"
+   },
+   {
+    "pageid": 1450923,
+    "ns": 14,
+    "title": "Category:Resurrection champion"
+   },
+   {
+    "pageid": 1210460,
+    "ns": 14,
+    "title": "Category:Root champion"
+   },
+   {
+    "pageid": 1711345,
+    "ns": 14,
+    "title": "Category:Self Crowd Control champion"
+   },
+   {
+    "pageid": 976766,
+    "ns": 14,
+    "title": "Category:Self Heal champion"
+   },
+   {
+    "pageid": 976767,
+    "ns": 14,
+    "title": "Category:Shapeshifter champion"
+   },
+   {
+    "pageid": 976770,
+    "ns": 14,
+    "title": "Category:Shield champion"
+   },
+   {
+    "pageid": 976769,
+    "ns": 14,
+    "title": "Category:Silence champion"
+   },
+   {
+    "pageid": 1344741,
+    "ns": 14,
+    "title": "Category:Sleep champion"
+   },
+   {
+    "pageid": 976771,
+    "ns": 14,
+    "title": "Category:Slow champion"
+   },
+   {
+    "pageid": 976773,
+    "ns": 14,
+    "title": "Category:Stance champion"
+   },
+   {
+    "pageid": 1344776,
+    "ns": 14,
+    "title": "Category:Stasis champion"
+   },
+   {
+    "pageid": 976298,
+    "ns": 14,
+    "title": "Category:Stealth champion"
+   },
+   {
+    "pageid": 976774,
+    "ns": 14,
+    "title": "Category:Stun champion"
+   },
+   {
+    "pageid": 976775,
+    "ns": 14,
+    "title": "Category:Suppress champion"
+   },
+   {
+    "pageid": 1344777,
+    "ns": 14,
+    "title": "Category:Suspend champion"
+   },
+   {
+    "pageid": 976776,
+    "ns": 14,
+    "title": "Category:Taunt champion"
+   },
+   {
+    "pageid": 1459281,
+    "ns": 14,
+    "title": "Category:Untargetable champion"
+   }
+  ]
+ }
+}

@@ -1,0 +1,8 @@
+# A shove lane: pushed under tower all lane; traits alone said bot wins.
+game: bot_shove
+role: jungle
+sections: [gank_first, lanes_in_trouble, enemy_jungler, start_objectives, counterpick, watch_out, dont_feed, game_plan]
+fired: [CHAMP-SNOWBALL, CHAMP-TP-THEM, JG-ENEMY-FARMER, JG-GANK-TARGET, JG-INVADE, JG-LANE-ASKS-GANK,
+  JG-RIVER-2V2-US, JG-STRONGER-US, JG-YOU-COUNTERED, LANE-LOSING, LANE-SHOVED-THEM,
+  MAP-ULT-JOIN-THEM, TEAM-THEIR-ENGAGE]
+not_fired: [LANE-WINNING, BOT-KILL-LANE-US, LANER-SELF-SUFFICIENT]

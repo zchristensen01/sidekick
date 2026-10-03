@@ -1,0 +1,10 @@
+key,spell_id,name
+1,SummonerBoost,Cleanse
+3,SummonerExhaust,Exhaust
+4,SummonerFlash,Flash
+6,SummonerHaste,Ghost
+7,SummonerHeal,Heal
+11,SummonerSmite,Smite
+12,SummonerTeleport,Teleport
+14,SummonerDot,Ignite
+21,SummonerBarrier,Barrier

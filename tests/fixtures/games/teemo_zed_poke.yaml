@@ -1,0 +1,23 @@
+# Game fixture (format: tests/fixtures/README.md). Champion ids are Data Dragon ids.
+name: teemo_zed_poke
+description: >
+  Ranged Teemo top into melee Darius, an assassin mid (Zed) into Galio, whose ult can join
+  other lanes' fights, and a poke bot lane (Caitlyn/Lux) into Jinx/Thresh. Enemy jungler is a
+  farmer (Kayn), ours an early ganker (Amumu).
+ddragon_version: "16.19.1"
+queue: normal_draft
+my_role: top
+ally:
+  top: Darius
+  jungle: Amumu
+  mid: Galio
+  bot: Jinx
+  support: Thresh
+enemy:
+  top: Teemo
+  jungle: Kayn
+  mid: Zed
+  bot: Caitlyn
+  support: Lux
+pick_turns: {Teemo: 6, Darius: 3}
+enemy_role_confidence: {}

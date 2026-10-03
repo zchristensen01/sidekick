@@ -1,0 +1,1144 @@
+# League scouting rules: generic, patch-stable advice with conditions the code can check.
+# Format, scopes, paths, ops and sections: docs/RULES.md. Paths per scope: scout/rules/context.py.
+# Section keys and the order they appear in for each role: docs/ROLES.md.
+#
+# Every rule needs a `tests` block: `fires` must make it fire, `not` must not (only list the
+# paths the rule reads; everything else is missing, and missing values never match).
+# `say`: our side's point of view, options with reasons, no numbers, no item names.
+# Converted from the prototype's rules on 2026-10-02 (M5); the role packs are new.
+
+rules:
+
+# ================================================================= LANE: any lane
+- id: LANE-LOSING
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 80
+  confidence: high
+  when: [[state.verdict, ==, losing], [state.range_mismatch, ==, false], [state.prio, "!=", them]]
+  say: "{lane} loses early ({us} vs {them}). Options: farm safely, don't fight for wave priority, and hold summoners for their all-in."
+  excludes: [LANE-WINNING, LANE-COINFLIP, LANE-EVEN]
+  tests:
+    fires: {state.verdict: losing, state.range_mismatch: false, state.prio: even}
+    not: {state.verdict: losing, state.range_mismatch: false, state.prio: them}
+
+- id: LANE-WINNING
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 75
+  confidence: high
+  when: [[state.verdict, ==, winning], [state.range_mismatch, ==, false]]
+  say: "{lane} wins early ({us} vs {them}): push for priority, deny farm, and ward their jungle entrance. A good lane to play around."
+  excludes: [LANE-COINFLIP, LANE-EVEN]
+  tests:
+    fires: {state.verdict: winning, state.range_mismatch: false}
+    not: {state.verdict: winning, state.range_mismatch: true}
+
+- id: LANE-COINFLIP
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 70
+  confidence: med
+  when: [[state.verdict, ==, even], [state.volatility, ">=", 4], [state.range_mismatch, ==, false], [state.prio, ==, even]]
+  say: "{lane} is volatile and even ({us} vs {them}): someone likely dies early, and whichever jungler shows up first probably decides it."
+  excludes: [LANE-EVEN]
+  tests:
+    fires: {state.verdict: even, state.volatility: 4.5, state.range_mismatch: false, state.prio: even}
+    not: {state.verdict: even, state.volatility: 3.0, state.range_mismatch: false, state.prio: even}
+
+- id: LANE-EVEN
+  scope: lane
+  audience: [top, mid, bot, support]
+  section: your_lane
+  priority: 60
+  confidence: med
+  when: [[state.verdict, ==, even], [state.volatility, "<", 4], [state.range_mismatch, ==, false], [state.prio, ==, even]]
+  say: "Even early ({us} vs {them}): farm, trade when their key cooldown is down, and the first jungler to show up decides it."
+  tests:
+    fires: {state.verdict: even, state.volatility: 3.0, state.range_mismatch: false, state.prio: even}
+    not: {state.verdict: even, state.volatility: 4.5, state.range_mismatch: false, state.prio: even}
+
+- id: LANE-KILL-SPELLS-THEM
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 74
+  confidence: med
+  when: [[them.spells, has_any, [ignite, exhaust]], [them.engage, ">=", 2]]
+  say: "{them} took Ignite or Exhaust on top of their engage: their early all-ins hit harder than usual, so respect the first one or match it with your own."
+  tests:
+    fires: {them.spells: [flash, ignite], them.engage: 2}
+    not: {them.spells: [flash, heal], them.engage: 3}
+
+- id: LANE-SCALER
+  scope: lane
+  audience: [top, mid, bot, support]
+  section: your_lane
+  priority: 55
+  confidence: high
+  when: [[us.scaling, ">=", 2.5], [them.scaling, "<=", 1.5]]
+  say: "{us} out-scales {them}: the goal is farm and experience, not kills. A small CS deficit is fine; dying isn't."
+  excludes: [LANE-THEY-SCALE]
+  tests:
+    fires: {us.scaling: 3.0, them.scaling: 1.0}
+    not: {us.scaling: 2.0, them.scaling: 1.0}
+
+- id: LANE-THEY-SCALE
+  scope: lane
+  audience: [top, mid, bot, support]
+  section: your_lane
+  priority: 55
+  confidence: high
+  when: [[them.scaling, ">=", 2.5], [us.scaling, "<=", 1.5]]
+  say: "{them} out-scales {us}: this lane wants to win early. Trade when you can and involve your jungler before their spikes."
+  tests:
+    fires: {them.scaling: 3.0, us.scaling: 1.0}
+    not: {them.scaling: 2.0, us.scaling: 1.0}
+
+- id: LANE-SHOVED-THEM
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 85
+  confidence: med
+  when: [[state.label, ==, pushed]]
+  say: "{lane}: {them} clear waves much faster than {us}, so expect {us} to be shoved under tower for much of the lane. Options: don't spend health fighting for the wave, last-hit under tower, and look for a gank when the wave crashes into your tower, since their laners stand far forward then."
+  tests:
+    fires: {state.label: pushed}
+    not: {state.label: bait}
+
+- id: LANE-BAIT
+  scope: lane
+  section: {jungle: gank_first, default: your_lane}
+  priority: 85
+  confidence: med
+  when: [[state.label, ==, bait]]
+  say: "{lane} is a bait lane: {them} push every wave, but {us} win the fights they can't avoid. Options: don't spend health on the wave, last-hit under tower, and punish them when they overstep; it's a good gank target, since their laners stand far forward."
+  tests:
+    fires: {state.label: bait}
+    not: {state.label: pushed}
+
+- id: LANE-SURVIVE
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 86
+  confidence: med
+  when: [[state.label, ==, survive]]
+  say: "{lane}: {them} push and win the fights ({us} behind on both). Options: give up some CS rather than health, don't contest the wave, and expect help only after the junglers' first clears, best when the wave crashes into your tower."
+  tests:
+    fires: {state.label: survive}
+    not: {state.label: pushed}
+
+- id: LANE-SHOVE-RESPECT
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 80
+  confidence: med
+  when: [[state.label, ==, shove_respect]]
+  say: "{lane}: {us} push faster but {them} win the fights. Options: shove and back off before the wave crashes, and don't stand in their engage range without a wave between you."
+  tests:
+    fires: {state.label: shove_respect}
+    not: {state.label: bully}
+
+- id: LANE-SHOVE-US
+  scope: lane
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 55
+  confidence: med
+  when: [[state.prio, ==, us], [state.fight, in, [us, even]]]
+  say: "{lane}: {us} clear waves much faster than {them}: options are shoving them under tower and using the time to ward, roam, or move first to an objective with your jungler."
+  tests:
+    fires: {state.prio: us, state.fight: even}
+    not: {state.prio: us, state.fight: them}
+
+# ================================================================= LANE: top
+- id: TOP-RANGED-INTO-US
+  scope: lane
+  lanes: [top]
+  section: {jungle: gank_first, default: your_lane}
+  priority: 80
+  confidence: high
+  when: [[us.range, ==, melee], [them.range, ==, ranged]]
+  say: "{them} is ranged against melee {us}: expect poke on every last hit. Options: a defensive start, letting the wave come to you, and not chasing. Ranged tops usually escape ganks poorly, so top is a gank target."
+  excludes: [LANE-WINNING]
+  tests:
+    fires: {us.range: melee, them.range: ranged}
+    not: {us.range: melee, them.range: melee}
+
+- id: TOP-US-RANGED
+  scope: lane
+  lanes: [top]
+  section: your_lane
+  priority: 75
+  confidence: high
+  when: [[us.range, ==, ranged], [them.range, ==, melee]]
+  say: "{us} is ranged into melee {them}: poke on their last hits and keep the wave near the middle. One gap-close plus a gank is dangerous, so ward river and track their jungler."
+  tests:
+    fires: {us.range: ranged, them.range: melee}
+    not: {us.range: ranged, them.range: ranged}
+
+- id: TOP-ALONE-EARLY
+  scope: lane
+  lanes: [top]
+  audience: [top]
+  section: jungle
+  priority: 70
+  confidence: med
+  when: [[gank.our_rank, ==, 3], [threat, ==, high]]
+  say: "Expect to be alone early: your jungler's best ganks are elsewhere and their jungler threatens top. Ward and play the wave safely."
+  tests:
+    fires: {gank.our_rank: 3, threat: high}
+    not: {gank.our_rank: 1, threat: high}
+
+- id: TOP-SPLIT-JOB
+  scope: ally
+  audience: [top]
+  section: your_job
+  priority: 60
+  confidence: med
+  when: [[us.role, ==, top], [us.tags, has, split_push], [team.n_frontline_others, ">=", 1]]
+  say: "Your job later is side-lane pressure: {name} split pushes well and your team has a frontline to hold the middle."
+  tests:
+    fires: {us.role: top, us.tags: [split_push], team.n_frontline_others: 1}
+    not: {us.role: top, us.tags: [split_push], team.n_frontline_others: 0}
+
+# ================================================================= LANE: mid
+- id: MID-ASSASSIN
+  scope: lane
+  lanes: [mid]
+  section: {jungle: watch_out, default: your_lane}
+  priority: 70
+  confidence: high
+  when: [[them.classes, has, assassin]]
+  say: "{them} is an assassin: level 6 plus their first damage item is the big spike. Push and poke before that, respect their kill threat after, and ping when they leave lane."
+  tests:
+    fires: {them.classes: [assassin]}
+    not: {them.classes: [burst]}
+
+- id: MID-GANK-SHAPE
+  scope: lane
+  lanes: [mid]
+  audience: [jungle]
+  section: gank_first
+  priority: 45
+  confidence: med
+  when: [[them.escape, "<=", 1]]
+  say: "Mid is short, so ganks are quick to set up, but {them} reaches tower quickly too: gank when they're pushed past the middle."
+  tests:
+    fires: {them.escape: 1}
+    not: {them.escape: 2}
+
+- id: MID-ROAM-THREAT
+  scope: map
+  audience: [mid]
+  section: {mid: roams, support: roams, default: map_threats}
+  priority: 60
+  confidence: med
+  when: [[them.mid.roam, ">=", 2], [them.mid.waveclear, ">=", 2]]
+  say: "{them_mid} pushes and roams: ping your side lanes the moment they leave mid."
+  tests:
+    fires: {them.mid.roam: 2, them.mid.waveclear: 2}
+    not: {them.mid.roam: 2, them.mid.waveclear: 1}
+
+- id: MID-ROAM-TARGET
+  scope: map
+  audience: [mid]
+  section: roams
+  priority: 60
+  confidence: med
+  when: [[us.mid.roam, ">=", 2], [roam_target.us.mid_gank, ">=", 6]]
+  say: "Your best roam is {mid_roam_lane}: their laners there are the easiest to catch. Push first so you don't lose farm."
+  tests:
+    fires: {us.mid.roam: 2, roam_target.us.mid_gank: 7.0}
+    not: {us.mid.roam: 1, roam_target.us.mid_gank: 7.0}
+
+- id: MID-RANGED-INTO-US
+  scope: lane
+  lanes: [mid]
+  audience: [mid, jungle]
+  section: {jungle: gank_first, default: your_lane}
+  priority: 75
+  confidence: high
+  when: [[us.range, ==, melee], [them.range, ==, ranged], [us.range_varies, ==, false], [them.range_varies, ==, false]]
+  say: "{them} outranges your melee {us} ({them_range} vs {us_range} attack range): expect poke while you last-hit. Options: let the wave come to you, trade when their main poke is down, and use your jungler to get in."
+  tests:
+    fires: {us.range: melee, them.range: ranged, us.range_varies: false, them.range_varies: false}
+    not: {us.range: melee, them.range: ranged, us.range_varies: false, them.range_varies: true}
+
+- id: MID-US-RANGED
+  scope: lane
+  lanes: [mid]
+  audience: [mid]
+  section: your_lane
+  priority: 70
+  confidence: high
+  when: [[us.range, ==, ranged], [them.range, ==, melee], [us.range_varies, ==, false], [them.range_varies, ==, false]]
+  say: "{us} outranges melee {them} ({us_range} vs {them_range} attack range): poke when they walk up to last-hit, and keep the wave in the middle so they can't reach you from safety."
+  tests:
+    fires: {us.range: ranged, them.range: melee, us.range_varies: false, them.range_varies: false}
+    not: {us.range: ranged, them.range: ranged, us.range_varies: false, them.range_varies: false}
+
+# ================================================================= LANE: bot (a 2v2)
+- id: BOT-OUTRANGED
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 70
+  confidence: high
+  when: [[state.range_gap, "<=", -75], [us.range_varies, ==, false], [them.range_varies, ==, false]]
+  say: "Their ADC outranges yours ({them_range} vs {us_range} attack range): they win free auto trades. Options: farm with less contact, trade when they step up for a last hit, and look for your support's engage rather than auto-trading."
+  excludes: [BOT-OUTRANGES-THEM]
+  tests:
+    fires: {state.range_gap: -150.0, us.range_varies: false, them.range_varies: false}
+    not: {state.range_gap: -25.0, us.range_varies: false, them.range_varies: false}
+
+- id: BOT-OUTRANGES-THEM
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 65
+  confidence: high
+  when: [[state.range_gap, ">=", 75], [us.range_varies, ==, false], [them.range_varies, ==, false]]
+  say: "Your ADC outranges theirs ({us_range} vs {them_range} attack range): auto them when they walk up to last-hit, and keep the wave where they have to come to you."
+  tests:
+    fires: {state.range_gap: 150.0, us.range_varies: false, them.range_varies: false}
+    not: {state.range_gap: 150.0, us.range_varies: true, them.range_varies: false}
+
+- id: BOT-KILL-LANE-THEM
+  scope: lane
+  lanes: [bot]
+  section: {jungle: lanes_in_trouble, default: your_lane}
+  priority: 85
+  confidence: high
+  when: [[them.engage, ">=", 3], [them.early, ">=", 2.5]]
+  say: "{them} is a kill lane built around early all-ins. Track who hits level 2 first, let them push early waves, play near tower, ward river, and ping your jungler: their overextension is the gank."
+  tests:
+    fires: {them.engage: 3, them.early: 3.0}
+    not: {them.engage: 2, them.early: 3.0}
+
+- id: BOT-KILL-LANE-US
+  scope: lane
+  lanes: [bot]
+  section: {jungle: gank_first, default: your_lane}
+  priority: 80
+  confidence: high
+  when: [[us.engage, ">=", 3], [us.early, ">=", 2.5]]
+  say: "{us} is a kill lane: play for the level 2 and level 6 all-ins; a jungler near bot river around their first clear makes it stronger."
+  tests:
+    fires: {us.engage: 3, us.early: 2.5}
+    not: {us.engage: 3, us.early: 2.0}
+
+- id: BOT-LEVEL-2
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 70
+  confidence: med
+  when: [[us.engage, ">=", 3], [them.engage, ">=", 3]]
+  say: "Both sides can all-in: the level 2 race decides the early trades, so track wave 1 and who gets level 2 first."
+  tests:
+    fires: {us.engage: 3, them.engage: 3}
+    not: {us.engage: 2, them.engage: 3}
+
+- id: BOT-ENGAGE-INTO-PEEL
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 65
+  confidence: med
+  when: [[us.engage, ">=", 3], [them.tags, has, peel]]
+  say: "Your engage runs into {them}'s peel: bait the peel spell before committing, or go onto the support instead of the carry."
+  tests:
+    fires: {us.engage: 3, them.tags: [peel]}
+    not: {us.engage: 3, them.tags: [poke]}
+
+- id: BOT-THEIR-ENGAGE-INTO-OUR-PEEL
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 65
+  confidence: med
+  when: [[them.engage, ">=", 3], [us.tags, has, peel]]
+  say: "Your peel answers their engage: save it for the engage itself, not for trades."
+  tests:
+    fires: {them.engage: 3, us.tags: [peel]}
+    not: {them.engage: 2, us.tags: [peel]}
+
+- id: BOT-MAGE-SUPPORT-VS-ENGAGE
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 65
+  confidence: med
+  when: [[us.support.classes, has_any, [artillery, burst, battlemage]], [them.engage, ">=", 3]]
+  say: "Mage support against engage: you win if poke keeps them low before their all-in. One landed engage on a squishy mage is usually a kill, so stand behind minions."
+  tests:
+    fires: {us.support.classes: [burst], them.engage: 3}
+    not: {us.support.classes: [enchanter], them.engage: 3}
+
+- id: BOT-ENCHANTER-VS-MAGE
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 60
+  confidence: med
+  when: [[us.support.classes, has, enchanter], [them.support.classes, has_any, [artillery, burst]]]
+  say: "Their mage support outranges you: avoid walking into poke for nothing, trade when they miss or burn a long cooldown, and let sustain carry you to your item spikes."
+  tests:
+    fires: {us.support.classes: [enchanter], them.support.classes: [artillery]}
+    not: {us.support.classes: [enchanter], them.support.classes: [vanguard]}
+
+- id: BOT-POKE-LANE
+  scope: lane
+  lanes: [bot]
+  audience: [bot, support]
+  section: your_lane
+  priority: 60
+  confidence: med
+  when: [[them.tags, has, poke], [us.tags, lacks, poke]]
+  say: "Poke lane: don't take free damage from {them}; the all-in window is when they misuse a key cooldown."
+  tests:
+    fires: {them.tags: [poke], us.tags: [peel]}
+    not: {them.tags: [poke], us.tags: [poke]}
+
+- id: SUP-ENGAGE-TARGET
+  scope: lane
+  lanes: [bot]
+  audience: [support]
+  section: your_lane
+  priority: 70
+  confidence: med
+  when: [[us.support.engage, ">=", 2], [them.bot.escape, ==, 0]]
+  say: "Their ADC has no escape: when you engage, the ADC is usually a better target than their support."
+  tests:
+    fires: {us.support.engage: 2, them.bot.escape: 0}
+    not: {us.support.engage: 2, them.bot.escape: 2}
+
+# ================================================================= LANE: jungle plan (laners)
+- id: LANER-ASK-GANK
+  scope: lane
+  audience: [top, mid, bot, support]
+  section: jungle
+  priority: 85
+  confidence: med
+  when: [[plan.kind, ==, ask_gank]]
+  say: "Consider asking your jungler for a gank around {phase}: {plan_why}."
+  tests:
+    fires: {plan.kind: ask_gank}
+    not: {plan.kind: ask_cover}
+
+- id: LANER-ASK-COVER
+  scope: lane
+  audience: [top, mid, bot, support]
+  section: jungle
+  priority: 85
+  confidence: med
+  when: [[plan.kind, ==, ask_cover]]
+  say: "Ask your jungler to cover you {phase}: {plan_why}. Play safe until they're close."
+  tests:
+    fires: {plan.kind: ask_cover}
+    not: {plan.kind: self_sufficient}
+
+- id: LANER-SELF-SUFFICIENT
+  scope: lane
+  audience: [top, mid, bot, support]
+  section: jungle
+  priority: 75
+  confidence: med
+  when: [[plan.kind, ==, self_sufficient]]
+  say: "You can hold this lane alone early: tell your jungler to play for the other lanes."
+  tests:
+    fires: {plan.kind: self_sufficient}
+    not: {plan.kind: danger}
+
+- id: LANER-DANGER
+  scope: lane
+  audience: [top, mid, bot, support]
+  section: jungle
+  priority: 90
+  confidence: med
+  when: [[plan.kind, ==, danger]]
+  say: "Their jungler is likely to look at you early and yours is likely on the other side ({plan_why}): play safe until you see their jungler."
+  tests:
+    fires: {plan.kind: danger}
+    not: {plan.kind: ask_gank}
+
+# ================================================================= LANE: jungler's view
+- id: JG-LANER-FIGHTS-2V1
+  scope: lane
+  lanes: [top, mid]
+  audience: [jungle]
+  section: gank_first
+  priority: 70
+  confidence: med
+  when: [[them.early, ">=", 3], [them.classes, has_any, [juggernaut, skirmisher, diver]]]
+  say: "{lane}: {them} is strong enough early to fight back against a 2v1: an early gank there needs CC that sticks, or wait until they've used their escape or your laner is ahead."
+  tests:
+    fires: {them.early: 3, them.classes: [juggernaut]}
+    not: {them.early: 2, them.classes: [juggernaut]}
+
+- id: JG-GANK-TARGET
+  scope: lane
+  audience: [jungle]
+  section: gank_first
+  priority: 80
+  confidence: high
+  when: [[them.escape, "<=", 0], [us.cc, ">=", 2]]
+  say: "{lane} is a strong gank: {them} has no escape and {us} can follow up with CC."
+  tests:
+    fires: {them.escape: 0, us.cc: 2}
+    not: {them.escape: 1, us.cc: 2}
+
+- id: JG-COVER-NOT-GANK
+  scope: lane
+  audience: [jungle]
+  section: lanes_in_trouble
+  priority: 70
+  confidence: med
+  when: [[state.diff, "<=", -1.5], [them.escape, ">=", 2], [plan.kind, "!=", ask_gank]]
+  say: "Avoid forcing ganks {lane}: {them} can escape and {us} is behind. Gank only if they overextend; otherwise hover and counter-gank."
+  excludes: [JG-LANE-ASKS-GANK]
+  tests:
+    fires: {state.diff: -2.0, them.escape: 2, plan.kind: ask_cover}
+    not: {state.diff: -2.0, them.escape: 2, plan.kind: ask_gank}
+
+- id: JG-HOVER-VOLATILE-BOT
+  scope: lane
+  lanes: [bot]
+  audience: [jungle]
+  section: lanes_in_trouble
+  priority: 70
+  confidence: high
+  when: [[state.volatility, ">=", 5.5]]
+  say: "Bot is very volatile: someone likely dies early. Being near bot river when their level 2 or 6 lands is worth planning for."
+  tests:
+    fires: {state.volatility: 6.0}
+    not: {state.volatility: 4.5}
+
+- id: JG-LANE-ASKS-GANK
+  scope: lane
+  audience: [jungle]
+  section: lanes_in_trouble
+  priority: 75
+  confidence: med
+  when: [[plan.kind, ==, ask_gank]]
+  say: "{lane} is behind but can be turned: a gank around {phase} works because {plan_why}."
+  tests:
+    fires: {plan.kind: ask_gank}
+    not: {plan.kind: self_sufficient}
+
+- id: JG-LANE-NEEDS-COVER
+  scope: lane
+  audience: [jungle]
+  section: lanes_in_trouble
+  priority: 65
+  confidence: med
+  when: [[plan.kind, ==, ask_cover]]
+  say: "{lane} needs cover {phase}: {plan_why}."
+  tests:
+    fires: {plan.kind: ask_cover}
+    not: {plan.kind: ask_gank}
+
+- id: JG-LANE-FINE
+  scope: lane
+  audience: [jungle]
+  section: lanes_in_trouble
+  priority: 35
+  confidence: med
+  when: [[plan.kind, ==, self_sufficient]]
+  say: "{lane} can hold alone early."
+  tests:
+    fires: {plan.kind: self_sufficient}
+    not: {plan.kind: danger}
+
+- id: JG-LANE-DANGER
+  scope: lane
+  audience: [jungle]
+  section: lanes_in_trouble
+  priority: 75
+  confidence: med
+  when: [[plan.kind, ==, danger]]
+  say: "Their jungler's most likely first gank is {lane} ({plan_why}): path toward it or warn them."
+  tests:
+    fires: {plan.kind: danger}
+    not: {plan.kind: ask_cover}
+
+# ================================================================= MAP (jungle matchup, priority, roams)
+- id: JG-INVADE
+  scope: map
+  section: start_objectives
+  priority: 65
+  confidence: high
+  when: [[them.jg.early, "<=", 1], [us.jg.early, ">=", 2], [lanes.mid.state.diff, ">=", 0]]
+  say: "{them_jg} is weak early and mid can move first: invading or taking their camps on the side where your laners can follow is an option."
+  excludes: [JG-WEAK-ENEMY-NO-PRIO]
+  tests:
+    fires: {them.jg.early: 1, us.jg.early: 2, lanes.mid.state.diff: 0.5}
+    not: {them.jg.early: 2, us.jg.early: 2, lanes.mid.state.diff: 0.5}
+
+- id: JG-WEAK-ENEMY-NO-PRIO
+  scope: map
+  section: enemy_jungler
+  priority: 60
+  confidence: med
+  when: [[them.jg.early, "<=", 1], [lanes.mid.state.diff, "<", 0]]
+  say: "{them_jg} is weak early, but mid can't move first: invade only with vision; otherwise gank and take scuttle."
+  tests:
+    fires: {them.jg.early: 1, lanes.mid.state.diff: -1.0}
+    not: {them.jg.early: 1, lanes.mid.state.diff: 0.5}
+
+- id: JG-STRONGER-ENEMY
+  scope: map
+  section: enemy_jungler
+  priority: 75
+  confidence: high
+  when: [[jg_diff, "<=", -1]]
+  say: "{them_jg} beats {us_jg} early 1v1: ward your own buffs, path away from them, and avoid contesting scuttle without a laner nearby."
+  excludes: [JG-STRONGER-US]
+  tests:
+    fires: {jg_diff: -1}
+    not: {jg_diff: 0}
+
+- id: JG-STRONGER-US
+  scope: map
+  section: enemy_jungler
+  priority: 70
+  confidence: high
+  when: [[jg_diff, ">=", 1]]
+  say: "{us_jg} beats {them_jg} early 1v1: contest scuttle and punish their pathing when you spot them."
+  tests:
+    fires: {jg_diff: 1}
+    not: {jg_diff: 0}
+
+- id: JG-ENEMY-GANKER
+  scope: map
+  audience: [top, jungle, mid, bot, support]
+  section: {jungle: enemy_jungler, default: jungle}
+  priority: 70
+  confidence: high
+  when: [[them.jg.style, ==, ganker]]
+  say: "{them_jg} is an early ganker: expect a gank after their first clear, most likely {their_gank_lane}."
+  excludes: [JG-ENEMY-FARMER]
+  tests:
+    fires: {them.jg.style: ganker}
+    not: {them.jg.style: farmer}
+
+- id: JG-ENEMY-FARMER
+  scope: map
+  audience: [jungle]
+  section: {jungle: enemy_jungler, default: jungle}
+  priority: 60
+  confidence: high
+  when: [[them.jg.style, ==, farmer]]
+  say: "{them_jg} prefers to farm and scale: early pressure and taking their camps when it's safe build a lead before their spikes."
+  tests:
+    fires: {them.jg.style: farmer}
+    not: {them.jg.style: ganker}
+
+- id: JG-INVADE-RISK
+  scope: map
+  section: enemy_jungler
+  priority: 75
+  confidence: med
+  when: [[invade_risk, ==, true]]
+  say: "Expect a possible level 1-2 invade from {them_jg}: ward your entrances and consider starting away from them."
+  tests:
+    fires: {invade_risk: true}
+    not: {invade_risk: false}
+
+- id: JG-DRAGON-SIDE
+  scope: map
+  section: start_objectives
+  priority: 55
+  confidence: med
+  when: [[priority.side, ==, bot]]
+  say: "Bot and mid can move first: playing bot side for the first dragon is an option."
+  excludes: [JG-TOP-SIDE]
+  tests:
+    fires: {priority.side: bot}
+    not: {priority.side: none}
+
+- id: JG-TOP-SIDE
+  scope: map
+  section: start_objectives
+  priority: 55
+  confidence: med
+  when: [[priority.side, ==, top]]
+  say: "Top and mid can move first: contesting the early top-side objective is an option (check what's on the map this patch)."
+  tests:
+    fires: {priority.side: top}
+    not: {priority.side: bot}
+
+- id: LANE-ENEMY-JG-FARMER
+  scope: map
+  audience: [top, mid, bot, support]
+  section: jungle
+  priority: 45
+  confidence: med
+  when: [[them.jg.style, ==, farmer]]
+  say: "{them_jg} usually farms first: expect fewer early ganks than from most junglers, so you can play your lane a bit more freely before their first items (still ward)."
+  tests:
+    fires: {them.jg.style: farmer}
+    not: {them.jg.style: ganker}
+
+- id: JG-RIVER-2V2-US
+  scope: map
+  audience: [jungle, mid]
+  section: {jungle: start_objectives, default: jungle}
+  priority: 65
+  confidence: med
+  when: [[skirmish.mid, ==, us]]
+  say: "Early 2v2s around mid and the river favor {mid_fight_us} over {mid_fight_them}: contesting scuttle and invading together are options."
+  excludes: [JG-RIVER-2V2-THEM]
+  tests:
+    fires: {skirmish.mid: us}
+    not: {skirmish.mid: even}
+
+- id: JG-RIVER-2V2-THEM
+  scope: map
+  audience: [jungle, mid]
+  section: {jungle: enemy_jungler, default: jungle}
+  priority: 70
+  confidence: med
+  when: [[skirmish.mid, ==, them]]
+  say: "Early 2v2s around mid and the river favor {mid_fight_them} over {mid_fight_us}: avoid contesting scuttle when both are near, and ping when their jungler shows mid."
+  tests:
+    fires: {skirmish.mid: them}
+    not: {skirmish.mid: us}
+
+- id: JG-BOTSIDE-FIGHTS-US
+  scope: map
+  audience: [jungle, bot, support]
+  section: {jungle: start_objectives, default: jungle}
+  priority: 60
+  confidence: med
+  when: [[skirmish.bot, ==, us]]
+  say: "Early fights near bot and dragon favor {bot_fight_us} over {bot_fight_them}: that's the side to play for early fights and the first dragon."
+  excludes: [JG-BOTSIDE-FIGHTS-THEM]
+  tests:
+    fires: {skirmish.bot: us}
+    not: {skirmish.bot: them}
+
+- id: JG-BOTSIDE-FIGHTS-THEM
+  scope: map
+  audience: [jungle, bot, support]
+  section: {jungle: lanes_in_trouble, default: jungle}
+  priority: 70
+  confidence: med
+  when: [[skirmish.bot, ==, them]]
+  say: "Early fights near bot and dragon favor {bot_fight_them} over {bot_fight_us}: fighting there works best after they've used their engage."
+  tests:
+    fires: {skirmish.bot: them}
+    not: {skirmish.bot: even}
+
+- id: JG-TOPSIDE-FIGHTS-US
+  scope: map
+  audience: [jungle, top]
+  section: {jungle: start_objectives, default: jungle}
+  priority: 55
+  confidence: med
+  when: [[skirmish.top, ==, us]]
+  say: "Early fights top side favor {top_fight_us} over {top_fight_them}: plays there and on the early top-side objective favor your team."
+  excludes: [JG-TOPSIDE-FIGHTS-THEM]
+  tests:
+    fires: {skirmish.top: us}
+    not: {skirmish.top: even}
+
+- id: JG-TOPSIDE-FIGHTS-THEM
+  scope: map
+  audience: [jungle, top]
+  section: {jungle: lanes_in_trouble, default: jungle}
+  priority: 60
+  confidence: med
+  when: [[skirmish.top, ==, them]]
+  say: "Early fights top side favor {top_fight_them} over {top_fight_us}: avoid early skirmishes there unless you have numbers."
+  tests:
+    fires: {skirmish.top: them}
+    not: {skirmish.top: us}
+
+- id: SUP-PEEL-JOB
+  scope: map
+  audience: [support]
+  section: protect_or_engage
+  priority: 70
+  confidence: med
+  when: [[us.support.tags, has, peel], [them_divers, ">=", 1]]
+  say: "Save your peel for {dive_threat} rather than trading with it in lane: they're the ones who reach your carry."
+  tests:
+    fires: {us.support.tags: [peel], them_divers: 2}
+    not: {us.support.tags: [peel], them_divers: 0}
+
+- id: SUP-ROAM-MID
+  scope: map
+  audience: [support]
+  section: roams
+  priority: 55
+  confidence: med
+  when: [[us.support.roam, ">=", 2], [lanes.mid.gank.on_them, ">=", 6]]
+  say: "Mid is your roam target once bot can hold: {them_mid} is easy to catch."
+  tests:
+    fires: {us.support.roam: 2, lanes.mid.gank.on_them: 6.5}
+    not: {us.support.roam: 2, lanes.mid.gank.on_them: 4.0}
+
+- id: SIDE-LANE-MID-ROAMER
+  scope: map
+  audience: [top, bot, support]
+  section: {support: roams, default: map_threats}
+  priority: 50
+  confidence: med
+  when: [[them.mid.roam, ">=", 2], [them.mid.waveclear, ">=", 2]]
+  say: "{them_mid} pushes and roams to side lanes: when they're missing from mid, play safe until you see them."
+  tests:
+    fires: {them.mid.roam: 2, them.mid.waveclear: 2}
+    not: {them.mid.roam: 2, them.mid.waveclear: 1}
+
+- id: MID-ENEMY-SUP-ROAMS
+  scope: map
+  audience: [mid]
+  section: roams
+  priority: 45
+  confidence: med
+  when: [[them.support.roam, ">=", 2]]
+  say: "{them_support} roams: expect them in mid when their bot wave is pushed, so keep your side brushes warded."
+  tests:
+    fires: {them.support.roam: 2}
+    not: {them.support.roam: 1}
+
+- id: SUP-ENEMY-ROAMER
+  scope: map
+  audience: [support]
+  section: roams
+  priority: 55
+  confidence: med
+  when: [[them.support.roam, ">=", 2]]
+  say: "{them_support} roams: warn mid when they leave bot."
+  tests:
+    fires: {them.support.roam: 2}
+    not: {them.support.roam: 1}
+
+# ================================================================= CROSS-MAP (champion scopes)
+- id: MAP-ULT-JOIN-THEM
+  scope: champ
+  section: {jungle: watch_out, mid: roams, support: roams, default: map_threats}
+  priority: 70
+  confidence: high
+  when: [[them.tags, has, ult_join]]
+  say: "After 6, check where {name} is before committing to a fight: their ult can bring them in."
+  tests:
+    fires: {them.tags: [ult_join]}
+    not: {them.tags: [global]}
+
+- id: MAP-ULT-JOIN-US
+  scope: ally
+  section: {jungle: gank_first, mid: roams, support: roams, default: map_threats}
+  priority: 55
+  confidence: med
+  when: [[us.tags, has, ult_join]]
+  say: "{name} can join your fights after 6: fights near their ult timing are in your favor."
+  tests:
+    fires: {us.tags: [ult_join]}
+    not: {us.tags: [peel]}
+
+- id: CHAMP-TP-THEM
+  scope: champ
+  section: {jungle: watch_out, mid: roams, support: roams, default: map_threats}
+  priority: 48
+  confidence: high
+  when: [[them.spells, has, teleport], [them.role, "!=", support]]
+  say: "{name} took Teleport: after their first back, expect them to join fights in other lanes; check their lane before you commit."
+  tests:
+    fires: {them.spells: [flash, teleport], them.role: top}
+    not: {them.spells: [flash, ignite], them.role: top}
+
+- id: MAP-GLOBAL-THEM
+  scope: champ
+  section: {jungle: watch_out, mid: roams, support: roams, default: map_threats}
+  priority: 60
+  confidence: high
+  when: [[them.tags, has, global], [them.tags, lacks, ult_join]]
+  say: "{name} can reach you anywhere: back earlier when low."
+  tests:
+    fires: {them.tags: [global]}
+    not: {them.tags: [global, ult_join]}
+
+# ================================================================= TEAM
+- id: TEAM-WE-SCALE
+  scope: team
+  section: game_plan
+  priority: 60
+  confidence: high
+  when: [[scaling_diff, ">=", 0.4]]
+  say: "Your team out-scales theirs: avoid coin-flip early fights and trade objectives rather than contesting from behind. Time is on your side."
+  excludes: [TEAM-THEY-SCALE]
+  tests:
+    fires: {scaling_diff: 0.5}
+    not: {scaling_diff: 0.2}
+
+- id: TEAM-THEY-SCALE
+  scope: team
+  section: game_plan
+  priority: 60
+  confidence: high
+  when: [[scaling_diff, "<=", -0.4]]
+  say: "Their team out-scales yours: build a lead early and look to close; a long game favors them."
+  tests:
+    fires: {scaling_diff: -0.5}
+    not: {scaling_diff: -0.2}
+
+- id: TEAM-THEY-EARLY
+  scope: team
+  section: game_plan
+  priority: 55
+  confidence: high
+  when: [[early_diff, "<=", -0.4]]
+  say: "Their team is stronger early: ward deep early and avoid fighting in their jungle before your spikes."
+  tests:
+    fires: {early_diff: -0.6}
+    not: {early_diff: 0.0}
+
+- id: TEAM-NO-ENGAGE
+  scope: team
+  section: game_plan
+  priority: 55
+  confidence: high
+  when: [[us.team.n_engagers, ==, 0]]
+  say: "Your team has no reliable engage: play for picks, poke, or their mistakes rather than forcing five-versus-five fights."
+  tests:
+    fires: {us.team.n_engagers: 0}
+    not: {us.team.n_engagers: 1}
+
+- id: TEAM-THEIR-ENGAGE
+  scope: team
+  section: {bot: fights, support: protect_or_engage, default: game_plan}
+  priority: 55
+  confidence: high
+  when: [[them.team.n_engagers, ">=", 2]]
+  say: "They have several engagers: fights start when they go in, so stay spread, hold Flash, and punish a failed engage while their cooldowns are down."
+  tests:
+    fires: {them.team.n_engagers: 2}
+    not: {them.team.n_engagers: 1}
+
+- id: TEAM-THEIR-ASSASSINS
+  scope: team
+  section: {bot: fights, default: game_plan}
+  priority: 55
+  confidence: high
+  when: [[them.team.n_assassin, ">=", 2]]
+  say: "Two or more assassins: squishies should move together, avoid facechecking, and an earlier defensive item is an option."
+  tests:
+    fires: {them.team.n_assassin: 2}
+    not: {them.team.n_assassin: 1}
+
+- id: BOT-DIVE-THREAT
+  scope: team
+  audience: [bot]
+  section: fights
+  priority: 70
+  confidence: med
+  when: [[them.team.n_dive_threats, ">=", 2]]
+  say: "You're their target in fights: they have several divers and assassins. Position behind your frontline and keep an escape for their engage."
+  tests:
+    fires: {them.team.n_dive_threats: 2}
+    not: {them.team.n_dive_threats: 1}
+
+- id: TEAM-DAMAGE-SKEW-PHYSICAL
+  scope: team
+  section: game_plan
+  priority: 45
+  confidence: high
+  when: [[them.team.damage.physical, ">=", 4]]
+  say: "They're mostly physical damage: armor is worth more than usual this game."
+  tests:
+    fires: {them.team.damage.physical: 4}
+    not: {them.team.damage.physical: 3}
+
+- id: TEAM-DAMAGE-SKEW-MAGIC
+  scope: team
+  section: game_plan
+  priority: 45
+  confidence: high
+  when: [[them.team.damage.magic, ">=", 4]]
+  say: "They're mostly magic damage: magic resist is worth more than usual this game."
+  tests:
+    fires: {them.team.damage.magic: 4}
+    not: {them.team.damage.magic: 3}
+
+# ================================================================= PER ENEMY CHAMPION
+- id: CHAMP-SNOWBALL
+  scope: champ
+  audience: their_lane
+  section: dont_feed
+  priority: 60
+  confidence: high
+  when: [[them.classes, has_any, [assassin, skirmisher]]]
+  say: "{name} snowballs off early kills: deny them, and if they get ahead their lane needs vision and cover."
+  tests:
+    fires: {them.classes: [assassin]}
+    not: {them.classes: [mage]}
+
+- id: CHAMP-NO-DASH-CARRY
+  scope: champ
+  audience: their_lane
+  section: {jungle: gank_first, default: punish}
+  priority: 55
+  confidence: high
+  when: [[them.escape, ==, 0], [them.classes, has_any, [marksman, artillery, burst, battlemage]], [them.role, "!=", jungle]]
+  say: "{name} has no dash: a prime gank and pick target, especially once Flash is down."
+  tests:
+    fires: {them.escape: 0, them.classes: [marksman], them.role: bot}
+    not: {them.escape: 2, them.classes: [marksman], them.role: bot}
+
+- id: CHAMP-LATE-CARRY
+  scope: champ
+  audience: their_lane
+  section: dont_feed
+  priority: 55
+  confidence: high
+  when: [[them.scaling, ">=", 3]]
+  say: "{name} scales hard{scaling_data}: punish early and deny farm; the longer the game goes, the stronger they get."
+  tests:
+    fires: {them.scaling: 3}
+    not: {them.scaling: 2}
+
+- id: CHAMP-JUGGERNAUT
+  scope: champ
+  audience: their_lane
+  section: watch_out
+  priority: 45
+  confidence: high
+  when: [[them.classes, has, juggernaut]]
+  say: "{name} wins long close-range fights: short trades, kite, and avoid fighting inside their minion wave."
+  tests:
+    fires: {them.classes: [juggernaut]}
+    not: {them.classes: [diver]}
+
+- id: CHAMP-RANGE-CHANGES
+  scope: champ
+  audience: their_lane
+  section: watch_out
+  priority: 50
+  confidence: high
+  when: [[them.range_varies, ==, true]]
+  say: "{name}'s attack range changes with their form or level, so the usual melee/ranged read doesn't hold all game: check their ability text for when."
+  tests:
+    fires: {them.range_varies: true}
+    not: {them.range_varies: false}
+
+# ================================================================= COUNTER-PICK (my matchup)
+# One context per game: my champion vs my lane opponent (docs/COUNTERPICK.md). The verdict line
+# itself (with the numbers) comes from scout/counterpick.py; these add how to play into it.
+- id: COUNTER-HARD
+  scope: counterpick
+  section: counterpick
+  priority: 80
+  confidence: high
+  when: [[outlook, ==, hard_counter], [label, in, [counter_picked, bad_draw]], [me.role, "!=", jungle]]
+  say: "Winning lane isn't the goal against {opp}: options are giving up CS under tower when you have to, trading only while their key ability is down, and asking your jungler for early cover. Reaching your item spikes alive is the win."
+  tests:
+    fires: {outlook: hard_counter, label: bad_draw, me.role: top}
+    not: {outlook: hard_counter, label: weak_patch, me.role: top}
+
+- id: COUNTER-SOFT
+  scope: counterpick
+  section: counterpick
+  priority: 70
+  confidence: med
+  when: [[outlook, ==, soft_counter], [label, in, [counter_picked, bad_draw]], [me.role, "!=", jungle]]
+  say: "{opp} has a slight edge on {me}: play even, avoid their power windows, and look for your spike to turn it."
+  tests:
+    fires: {outlook: soft_counter, label: counter_picked, me.role: mid}
+    not: {outlook: soft_counter, label: weak_patch, me.role: mid}
+
+- id: JG-COUNTER-BAD
+  scope: counterpick
+  section: counterpick
+  priority: 80
+  confidence: med
+  when: [[outlook, in, [soft_counter, hard_counter]], [label, in, [counter_picked, bad_draw]], [me.role, ==, jungle]]
+  say: "{opp} has the better matchup overall. Options: stay away from their side early unless your lanes can move first, ward their entrances, and path toward your strongest lanes."
+  tests:
+    fires: {outlook: hard_counter, label: bad_draw, me.role: jungle}
+    not: {outlook: hard_counter, label: weak_patch, me.role: jungle}
+
+- id: COUNTER-PICKED-AFTER
+  scope: counterpick
+  section: counterpick
+  priority: 85
+  confidence: high
+  when: [[label, ==, counter_picked]]
+  say: "They locked {opp} after seeing {me}, so expect them to play aggressively early; respect it."
+  tests:
+    fires: {label: counter_picked}
+    not: {label: bad_draw}
+
+- id: COUNTER-WEAK-PATCH
+  scope: counterpick
+  section: counterpick
+  priority: 65
+  confidence: med
+  when: [[label, ==, weak_patch]]
+  say: "Play your normal game against {opp}, a bit safer: the matchup itself isn't the problem."
+  tests:
+    fires: {label: weak_patch}
+    not: {label: counter_picked}
+
+- id: YOU-COUNTERED
+  scope: counterpick
+  section: counterpick
+  priority: 75
+  confidence: high
+  when: [[label, ==, you_countered], [me.role, "!=", jungle]]
+  say: "You have the matchup. Options: press it early, take priority, deny CS, and make plays before their spikes."
+  tests:
+    fires: {label: you_countered, me.role: top}
+    not: {label: favorable, me.role: top}
+
+- id: JG-YOU-COUNTERED
+  scope: counterpick
+  section: counterpick
+  priority: 75
+  confidence: med
+  when: [[outlook, ==, favorable], [me.role, ==, jungle]]
+  say: "You win early jungle fights against {opp}. Options: track their start and contest their camps or scuttles when your lanes can move first."
+  tests:
+    fires: {outlook: favorable, me.role: jungle}
+    not: {outlook: even, me.role: jungle}
+
+- id: COUNTER-WE-SCALE
+  scope: counterpick
+  section: counterpick
+  priority: 78
+  confidence: high
+  when: [[outlook, in, [soft_counter, hard_counter]], [me.scaling, ">", 2], [me.role, "!=", jungle]]
+  say: "You out-scale {opp}: losing lane slightly is fine; dying isn't."
+  tests:
+    fires: {outlook: hard_counter, me.scaling: 3, me.role: mid}
+    not: {outlook: hard_counter, me.scaling: 3, me.role: jungle}
+
+# ================================================================= ENEMY AND ALLY COMBOS
+- id: SYN-AIRBORNE
+  scope: pair
+  section: watch_out
+  priority: 65
+  confidence: high
+  when: [[a.tags, has, needs_airborne], [b.tags, has, airborne]]
+  say: "{team} {a} + {b}: when {b} knocks someone up, expect {a}'s ult right after."
+  tests:
+    fires: {a.tags: [needs_airborne], b.tags: [airborne]}
+    not: {a.tags: [needs_airborne], b.tags: [peel]}
+
+- id: SYN-CC-FOLLOW
+  scope: pair
+  section: watch_out
+  priority: 60
+  confidence: high
+  when: [[a.tags, has, follows_cc], [b.cc, ">=", 3]]
+  say: "{team} {a} + {b}: whatever {b} locks down, {a} dashes onto."
+  tests:
+    fires: {a.tags: [follows_cc], b.cc: 3}
+    not: {a.tags: [follows_cc], b.cc: 2}

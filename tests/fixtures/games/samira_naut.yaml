@@ -1,0 +1,22 @@
+# Game fixture (format: tests/fixtures/README.md). Champion ids are Data Dragon ids.
+name: samira_naut
+description: >
+  The prototype's sample game. Bot is a Samira/Nautilus kill lane into Jhin/Lulu; enemy Yasuo
+  has two knock-up partners (Malphite, Nautilus); enemy jungler is an early ganker.
+ddragon_version: "16.19.1"
+queue: ranked_solo
+my_role: jungle            # default role for `scout report`; --role overrides
+ally:
+  top: Garen
+  jungle: LeeSin
+  mid: Ahri
+  bot: Jhin
+  support: Lulu
+enemy:
+  top: Malphite
+  jungle: Elise
+  mid: Yasuo
+  bot: Samira
+  support: Nautilus
+pick_turns: {}             # optional: champ_id -> draft turn index (for counter-pick tests)
+enemy_role_confidence: {}  # optional: role -> confidence (default 1.0 in hand-written games)

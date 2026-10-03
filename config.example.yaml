@@ -1,0 +1,76 @@
+# Copy to config.yaml (gitignored). Secrets go in .env, not here.
+# Every key is documented here; scout/config.py validates it and explains any mistake.
+
+player:
+  # Who is logged in and your role come from the League client; nothing to type here.
+  platform: na1                # Riot API platform routing (na1, euw1, kr, ...); set from the client
+  regional_route: americas     # Riot API regional routing (americas, europe, asia)
+  # Optional, older setting: the first champion list, used only until pool.yaml exists (the
+  # app's Champions page keeps one list per account in pools/). Data Dragon ids, e.g. LeeSin.
+  champ_pool:
+    jungle: []
+    top: []
+    mid: []
+    bot: []
+    support: []
+
+client:
+  # The client is found from its running process. The lockfile is only a fallback.
+  lockfile_path: "C:\\Riot Games\\League of Legends\\lockfile"
+  poll_seconds: 1              # polling interval when the websocket isn't available
+
+stats:
+  rank_filter: opgg_default    # OP.GG's main tools have no rank parameter yet (docs/STATS.md)
+  min_games_display: 500       # below this (after blending), don't show the number; use traits
+  prior_games: 1000            # shrinkage strength for matchups (docs/STATS.md rule 2)
+  synergy_prior_games: 500     # shrinkage strength for synergies
+  previous_patch_weight: 0.5   # how much last patch counts early in a new patch (0 disables)
+  max_age_hours: 24            # lane stats older than this are refreshed
+  matchup_max_age_hours: 72    # matchup tables, labels and synergies
+  opgg_min_interval_s: 1.0     # politeness: at least this long between OP.GG calls
+  collect: true                # measure Emerald+ games from Riot's match data while you're
+                               # not in a game (needs the Riot key; Settings has the switch)
+
+counterpick:                   # bands on the shrunk matchup rate, in percent (docs/COUNTERPICK.md)
+  favorable_at: 51.5
+  even_from: 48.5
+  soft_from: 46.5              # below this = hard counter
+  specific_delta: 1.5          # points worse than expected to count as a specific counter
+
+roles:
+  low_confidence_below: 0.6    # enemy role guesses below this are named as flex picks
+
+report:
+  fetch_budget_seconds: 5      # how long the report waits for in-flight stats calls
+  save_dir: reports
+  # At the loading screen, each visible player's OP.GG record on their champion (rank, games,
+  # win rate, average K/D/A). An outside review read Riot's developer policy as discouraging
+  # showing other players' rank or win rate; it's your call (docs/POLICY.md). false turns it
+  # off. Settings in the app has the same switch.
+  player_records: true
+  # The top bar's "Research due" button after a new patch. Only the person who runs the prompts
+  # in research/ needs it (the owner); everyone else gets the results with the app's updates.
+  research_reminders: false
+
+llm:
+  provider: anthropic          # anthropic | ollama | none (none = deterministic text only)
+  model: claude-haiku-4-5-20251001   # fast and cheap; try claude-sonnet-5-5 if reports read poorly
+  ollama_model: ""             # a local model name, if provider is ollama
+  ollama_url: "http://localhost:11434"   # where Ollama listens, if provider is ollama
+  max_output_tokens: 1000      # caps the length (and cost) of each written report
+  # Spending safety: after this many writer calls in a day, reports fall back to the free
+  # rules version. Every call is logged with tokens and estimated cost in
+  # reports/debug/llm_usage.csv; `scout doctor` shows today's total.
+  max_calls_per_day: 40
+  timeout_seconds: 30
+  # For the cost estimate only (USD per million tokens; Haiku 4.5 prices on 2026-10-02,
+  # check anthropic.com/pricing if you change the model).
+  price_input_per_mtok: 1.0
+  price_output_per_mtok: 5.0
+  # No temperature setting on purpose: newer models reject it (docs/REPORT_AGENT.md).
+  max_words:
+    jungle: 150
+    top: 120
+    mid: 120
+    bot: 120
+    support: 120

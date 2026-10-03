@@ -1,0 +1,8 @@
+# Same line endings on Windows and WSL (docs/ARCHITECTURE.md, Runtime).
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.jpg binary
+*.sqlite binary

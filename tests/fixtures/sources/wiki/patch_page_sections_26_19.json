@@ -1,0 +1,118 @@
+{
+ "parse": {
+  "title": "V26.19",
+  "pageid": 1744305,
+  "sections": [
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "New Cosmetics",
+    "number": "1",
+    "index": "1",
+    "fromtitle": "V26.19",
+    "byteoffset": 658,
+    "anchor": "New_Cosmetics",
+    "linkAnchor": "New_Cosmetics"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "League of Legends V26.19",
+    "number": "2",
+    "index": "2",
+    "fromtitle": "V26.19",
+    "byteoffset": 2176,
+    "anchor": "League_of_Legends_V26.19",
+    "linkAnchor": "League_of_Legends_V26.19"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Game",
+    "number": "2.1",
+    "index": "3",
+    "fromtitle": "V26.19",
+    "byteoffset": 2207,
+    "anchor": "Game",
+    "linkAnchor": "Game"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Champions",
+    "number": "2.2",
+    "index": "4",
+    "fromtitle": "V26.19",
+    "byteoffset": 2801,
+    "anchor": "Champions",
+    "linkAnchor": "Champions"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Items",
+    "number": "2.3",
+    "index": "5",
+    "fromtitle": "V26.19",
+    "byteoffset": 9161,
+    "anchor": "Items",
+    "linkAnchor": "Items"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "ARAM: Mayhem",
+    "number": "2.4",
+    "index": "6",
+    "fromtitle": "V26.19",
+    "byteoffset": 9391,
+    "anchor": "ARAM:_Mayhem",
+    "linkAnchor": "ARAM:_Mayhem"
+   },
+   {
+    "toclevel": 2,
+    "level": "3",
+    "line": "Arena",
+    "number": "2.5",
+    "index": "7",
+    "fromtitle": "V26.19",
+    "byteoffset": 10474,
+    "anchor": "Arena",
+    "linkAnchor": "Arena"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "October 2nd Queue Update",
+    "number": "3",
+    "index": "8",
+    "fromtitle": "V26.19",
+    "byteoffset": 18847,
+    "anchor": "October_2nd_Queue_Update",
+    "linkAnchor": "October_2nd_Queue_Update"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "References",
+    "number": "4",
+    "index": "",
+    "byteoffset": null,
+    "anchor": "References",
+    "linkAnchor": "References"
+   },
+   {
+    "toclevel": 1,
+    "level": "2",
+    "line": "See Also",
+    "number": "5",
+    "index": "9",
+    "fromtitle": "V26.19",
+    "byteoffset": 19257,
+    "anchor": "See_Also",
+    "linkAnchor": "See_Also"
+   }
+  ],
+  "showtoc": ""
+ }
+}

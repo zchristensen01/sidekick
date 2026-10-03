@@ -1,0 +1,107 @@
+[
+  {
+    "id": -1,
+    "name": "None",
+    "description": "",
+    "alias": "None",
+    "contentId": "",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/-1.png",
+    "roles": []
+  },
+  {
+    "id": 31,
+    "name": "Cho'Gath",
+    "description": "the Terror of the Void",
+    "alias": "Chogath",
+    "contentId": "f225e3e3-e08a-4583-a54a-734d9f4a8b1e",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/31.png",
+    "roles": [
+      "tank",
+      "mage"
+    ]
+  },
+  {
+    "id": 62,
+    "name": "Wukong",
+    "description": "the Monkey King",
+    "alias": "MonkeyKing",
+    "contentId": "fdb8b34a-6480-4af7-b81d-300fc22131ea",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/62.png",
+    "roles": [
+      "fighter",
+      "tank"
+    ]
+  },
+  {
+    "id": 64,
+    "name": "Lee Sin",
+    "description": "the Blind Monk",
+    "alias": "LeeSin",
+    "contentId": "58166fc6-1571-47e1-884f-680ef6e7488e",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/64.png",
+    "roles": [
+      "fighter",
+      "assassin"
+    ]
+  },
+  {
+    "id": 111,
+    "name": "Nautilus",
+    "description": "the Titan of the Depths",
+    "alias": "Nautilus",
+    "contentId": "f11b0404-5847-4066-980b-bb02cc24cddd",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/111.png",
+    "roles": [
+      "tank",
+      "support"
+    ]
+  },
+  {
+    "id": 126,
+    "name": "Jayce",
+    "description": "the Defender of Tomorrow",
+    "alias": "Jayce",
+    "contentId": "37bdbc12-9ccd-4e96-a07c-0e95160ad05f",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/126.png",
+    "roles": [
+      "fighter",
+      "marksman"
+    ]
+  },
+  {
+    "id": 150,
+    "name": "Gnar",
+    "description": "the Missing Link",
+    "alias": "Gnar",
+    "contentId": "db03756a-efa1-434d-a737-d07f98551361",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/150.png",
+    "roles": [
+      "fighter",
+      "tank"
+    ]
+  },
+  {
+    "id": 876,
+    "name": "Lillia",
+    "description": "the Bashful Bloom",
+    "alias": "Lillia",
+    "contentId": "9ac93543-a5f2-4e06-8ab4-f64c8a895708",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/876.png",
+    "roles": [
+      "fighter",
+      "mage"
+    ]
+  },
+  {
+    "id": 60064,
+    "name": "Lee Sin",
+    "description": "The Blind Monk",
+    "alias": "Jade_LeeSin",
+    "contentId": "63bfdc75-a498-456c-9895-a1df1bcdec78",
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60064.png",
+    "roles": [
+      "fighter",
+      "assassin"
+    ]
+  }
+]

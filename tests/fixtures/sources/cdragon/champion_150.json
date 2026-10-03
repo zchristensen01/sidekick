@@ -1,0 +1,643 @@
+{
+ "id": 150,
+ "contentId": "db03756a-efa1-434d-a737-d07f98551361",
+ "name": "Gnar",
+ "alias": "Gnar",
+ "title": "the Missing Link",
+ "isVisibleInClient": true,
+ "tacticalInfo": {
+  "style": 5,
+  "difficulty": 3,
+  "damageType": "kPhysical",
+  "attackType": "ranged"
+ },
+ "playstyleInfo": {
+  "damage": 2,
+  "durability": 3,
+  "crowdControl": 2,
+  "mobility": 2,
+  "utility": 1
+ },
+ "championTagInfo": {
+  "championTagPrimary": "Shapeshift",
+  "championTagSecondary": "Crowd Control"
+ },
+ "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/150.png",
+ "stingerSfxPath": "/lol-game-data/assets/v1/champion-sfx-audios/150.ogg",
+ "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/150.ogg",
+ "banVoPath": "/lol-game-data/assets/v1/champion-ban-vo/150.ogg",
+ "roles": [
+  "fighter",
+  "tank"
+ ],
+ "recommendedItemDefaults": [],
+ "passive": {
+  "name": "Rage Gene",
+  "abilityIconPath": "/lol-game-data/assets/ASSETS/Characters/Gnar/HUD/Icons2D/Gnar_Passive.png",
+  "abilityVideoPath": "champion-abilities/0150/ability_0150_P1.webm",
+  "abilityVideoImagePath": "champion-abilities/0150/ability_0150_P1.jpg",
+  "description": "While in combat Gnar generates Rage. At maximum Rage his next ability will transform him into Mega Gnar, granting increased survivability and access to new spells."
+ },
+ "spells": [
+  {
+   "spellKey": "q",
+   "name": "Boomerang Throw / Boulder Toss",
+   "abilityIconPath": "/lol-game-data/assets/ASSETS/Characters/Gnar/HUD/Icons2D/Gnar_Q.png",
+   "abilityVideoPath": "champion-abilities/0150/ability_0150_Q1.webm",
+   "abilityVideoImagePath": "champion-abilities/0150/ability_0150_Q1.jpg",
+   "cost": "No Cost",
+   "cooldown": "@Cooldown@s %i:cooldown%",
+   "description": "Gnar throws a boomerang that damages and slows enemies it hits before returning to him. If he catches the boomerang its cooldown is reduced.<br><br>Mega Gnar instead throws a boulder that stops on the first unit hit, damaging and slowing everything nearby. It can then be picked up to reduce the cooldown.",
+   "dynamicDescription": "<keywordMajor>Mini Gnar:</keywordMajor> Gnar throws a boomerang that deals <physicalDamage>@spell.GnarQ:MiniTotalDamage@ physical damage</physicalDamage> and <status>Slows</status> by @spell.GnarQ:SlowAmount*100@% for @spell.GnarQ:SlowDuration@ seconds. The boomerang returns after hitting an enemy, dealing reduced damage to subsequent targets. Each enemy can only be hit once. Catching the boomerang reduces its Cooldown by @spell.GnarQ:MiniCDRefund*100@%.@SpellModifierDescriptionAppend@",
+   "range": [
+    1100.0,
+    1100.0,
+    1100.0,
+    1100.0,
+    1100.0,
+    1100.0
+   ],
+   "costCoefficients": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cooldownCoefficients": [
+    16.0,
+    14.5,
+    13.0,
+    11.5,
+    10.0,
+    10.0
+   ],
+   "coefficients": {
+    "coefficient1": 0.0,
+    "coefficient2": 0.0
+   },
+   "effectAmounts": {
+    "Effect1Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect2Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect3Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect4Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect5Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect6Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect7Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect8Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect9Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect10Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "ammo": {
+    "ammoRechargeTime": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "maxAmmo": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "maxLevel": 0
+  },
+  {
+   "spellKey": "w",
+   "name": "Hyper / Wallop",
+   "abilityIconPath": "/lol-game-data/assets/ASSETS/Characters/Gnar/HUD/Icons2D/Gnar_W.png",
+   "abilityVideoPath": "champion-abilities/0150/ability_0150_W1.webm",
+   "abilityVideoImagePath": "champion-abilities/0150/ability_0150_W1.jpg",
+   "cost": "No Cost",
+   "cooldown": "@Cooldown@s %i:cooldown%",
+   "description": "Gnar's attacks and spells hype him up, dealing bonus damage and granting him Move Speed.<br><br>Mega Gnar is too enraged to be hyper and instead can rear up on his hind legs and smash down on the area in front of him, stunning enemies in an area.",
+   "dynamicDescription": "<keywordMajor>Mini Gnar Passive:</keywordMajor> Every third Attack or Ability on the same enemy deals an additional <magicDamage>@spell.GnarW:MiniTotalDamage@ plus @spell.GnarW:MiniPercentHPDamage*100@% max Health magic damage</magicDamage> and grants <speed>@spell.GnarR:RHyperMovementSpeedPercent@% Move Speed</speed> decaying over @spell.GnarW:MiniHasteDuration@ seconds.@SpellModifierDescriptionAppend@",
+   "range": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "costCoefficients": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cooldownCoefficients": [
+    7.0,
+    7.0,
+    7.0,
+    7.0,
+    7.0,
+    7.0
+   ],
+   "coefficients": {
+    "coefficient1": 0.0,
+    "coefficient2": 0.0
+   },
+   "effectAmounts": {
+    "Effect1Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect2Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect3Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect4Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect5Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect6Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect7Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect8Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect9Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect10Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "ammo": {
+    "ammoRechargeTime": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "maxAmmo": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "maxLevel": 0
+  },
+  {
+   "spellKey": "e",
+   "name": "Hop / Crunch",
+   "abilityIconPath": "/lol-game-data/assets/ASSETS/Characters/Gnar/HUD/Icons2D/Gnar_E.png",
+   "abilityVideoPath": "champion-abilities/0150/ability_0150_E1.webm",
+   "abilityVideoImagePath": "champion-abilities/0150/ability_0150_E1.jpg",
+   "cost": "No Cost",
+   "cooldown": "@Cooldown@s %i:cooldown%",
+   "description": "Gnar leaps to a location and bounces off the head of any unit he lands on, traveling further.<br><br>Mega Gnar is too large to bounce and instead lands with earth-shattering force, dealing damage in an area around him.",
+   "dynamicDescription": "<keywordMajor>Mini Gnar:</keywordMajor> Gnar leaps, gaining <attackSpeed>@spell.GnarE:MinibAS*100@% Attack Speed</attackSpeed> for @spell.GnarE:MiniASDuration@ seconds. If Gnar lands on a unit he will bounce off it, traveling further. Bouncing off an enemy deals <physicalDamage>@spell.GnarE:MiniTotalDamage@ physical damage</physicalDamage> and briefly <status>Slows</status> by @spell.GnarE:MoveSpeedMod*-100@%.@SpellModifierDescriptionAppend@",
+   "range": [
+    475.0,
+    475.0,
+    475.0,
+    475.0,
+    475.0,
+    475.0
+   ],
+   "costCoefficients": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cooldownCoefficients": [
+    22.0,
+    19.5,
+    17.0,
+    14.5,
+    12.0,
+    12.0
+   ],
+   "coefficients": {
+    "coefficient1": 6.0,
+    "coefficient2": 6.0
+   },
+   "effectAmounts": {
+    "Effect1Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect2Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect3Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect4Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect5Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect6Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect7Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect8Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect9Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect10Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "ammo": {
+    "ammoRechargeTime": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "maxAmmo": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "maxLevel": 0
+  },
+  {
+   "spellKey": "r",
+   "name": "GNAR!",
+   "abilityIconPath": "/lol-game-data/assets/ASSETS/Characters/Gnar/HUD/Icons2D/GnarBig_R.png",
+   "abilityVideoPath": "champion-abilities/0150/ability_0150_R1.webm",
+   "abilityVideoImagePath": "champion-abilities/0150/ability_0150_R1.jpg",
+   "cost": "No Cost",
+   "cooldown": "@Cooldown@s %i:cooldown%",
+   "description": "Mega Gnar throws everything around him in a chosen direction, dealing damage and slowing them.  Any enemy that hits a wall is stunned and takes bonus damage.",
+   "dynamicDescription": "<keywordMajor>Mini Gnar Passive:</keywordMajor> Increase <spellName>Hyper's</spellName> <speed>Move Speed</speed>.<br><br><keywordMajor>Mega Gnar:</keywordMajor> Gnar tosses nearby enemies, dealing <physicalDamage>@Damage@ physical damage</physicalDamage>, <status>Knocking Back</status>, and <status>Slowing</status> them by @RSlowPercent@% for @RCCDuration@ seconds. Enemies that hit a wall instead take <physicalDamage>@WallDamage@ physical damage</physicalDamage> and are <status>Stunned</status>.@SpellModifierDescriptionAppend@",
+   "range": [
+    590.0,
+    590.0,
+    590.0,
+    590.0,
+    590.0,
+    590.0
+   ],
+   "costCoefficients": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cooldownCoefficients": [
+    90.0,
+    60.0,
+    30.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "coefficients": {
+    "coefficient1": 0.2,
+    "coefficient2": 0.5
+   },
+   "effectAmounts": {
+    "Effect1Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect2Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect3Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect4Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect5Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect6Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect7Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect8Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect9Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Effect10Amount": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "ammo": {
+    "ammoRechargeTime": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "maxAmmo": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "maxLevel": 0
+  }
+ ]
+}

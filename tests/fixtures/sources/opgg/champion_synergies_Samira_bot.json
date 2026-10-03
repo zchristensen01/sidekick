@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "class LolGetChampionSynergies: champion,my_position,synergy_position,lang,data\nclass Data: synergies\nclass Synergie: champion_id,champion_name,position,synergy_champion_id,synergy_champion_name,synergy_position,score_rank,score,play,win,win_rate,synergy_tier_data\nclass SynergyTierData: tier,rank,rank_prev,rank_prev_patch\n\nLolGetChampionSynergies(\"Samira\",\"adc\",\"support\",\"en_US\",Data([Synergie(360,\"Samira\",\"ADC\",111,\"Nautilus\",\"SUPPORT\",1,0,1700,906,0.53,SynergyTierData(2,9,9,9)),Synergie(360,\"Samira\",\"ADC\",526,\"Rell\",\"SUPPORT\",2,0,797,412,0.52,SynergyTierData(2,4,4,5)),Synergie(360,\"Samira\",\"ADC\",89,\"Leona\",\"SUPPORT\",3,0,714,387,0.54,SynergyTierData(2,6,6,4)),Synergie(360,\"Samira\",\"ADC\",12,\"Alistar\",\"SUPPORT\",4,0,600,300,0.5,SynergyTierData(2,8,8,7)),Synergie(360,\"Samira\",\"ADC\",53,\"Blitzcrank\",\"SUPPORT\",5,0,532,281,0.53,SynergyTierData(1,2,2,2)),Synergie(360,\"Samira\",\"ADC\",412,\"Thresh\",\"SUPPORT\",6,0,495,249,0.5,SynergyTierData(1,1,1,1)),Synergie(360,\"Samira\",\"ADC\",555,\"Pyke\",\"SUPPORT\",7,0,340,160,0.47,SynergyTierData(3,15,16,16)),Synergie(360,\"Samira\",\"ADC\",80,\"Pantheon\",\"SUPPORT\",8,0,323,151,0.47,SynergyTierData(4,27,29,24)),Synergie(360,\"Samira\",\"ADC\",517,\"Sylas\",\"SUPPORT\",9,0,145,65,0.45,SynergyTierData(4,37,37,35)),Synergie(360,\"Samira\",\"ADC\",164,\"Camille\",\"SUPPORT\",10,0,138,69,0.5,SynergyTierData(4,44,44,44))]))"
+      }
+    ]
+  }
+}

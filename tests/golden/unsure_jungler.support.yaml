@@ -1,0 +1,7 @@
+# Expected report shape (docs/RULES.md, Tests). Update on purpose.
+game: unsure_jungler
+role: support
+sections: [your_lane, counterpick, punish, jungle, protect_or_engage, dont_feed, game_plan]
+fired: [BOT-POKE-LANE, CHAMP-NO-DASH-CARRY, COUNTER-HARD, JG-BOTSIDE-FIGHTS-THEM, JG-ENEMY-GANKER,
+  LANE-LOSING, LANER-ASK-GANK, SUP-PEEL-JOB, TEAM-THEIR-ENGAGE, TEAM-THEY-EARLY, TEAM-WE-SCALE]
+not_fired: [JG-STRONGER-US, JG-STRONGER-ENEMY, LANE-WINNING, TOP-RANGED-INTO-US]

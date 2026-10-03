@@ -1,0 +1,36 @@
+# Game fixture (format: tests/fixtures/README.md). Champion ids are Data Dragon ids.
+name: bot_shove
+description: >
+  Sivir/Seraphine push Kog'Maw/Braum under tower all lane: no deaths, but no farm. Traits alone
+  say our bot wins early (more engage and CC); OP.GG's lane advantage says Seraphine's side.
+  The report must warn about the shove and must not say "early game favors you" when the
+  numbers say otherwise.
+ddragon_version: "16.19.1"
+queue: ranked_solo
+my_role: support
+ally:
+  top: Garen
+  jungle: Elise
+  mid: Syndra
+  bot: KogMaw
+  support: Braum
+enemy:
+  top: Darius
+  jungle: Kayn
+  mid: TwistedFate
+  bot: Sivir
+  support: Seraphine
+pick_turns: {}
+side: red
+spells:                    # as the loading screen shows them
+  Garen: [teleport, flash]
+  Elise: [smite, flash]
+  Syndra: [ignite, flash]
+  KogMaw: [barrier, flash]
+  Braum: [flash, ignite]
+  Darius: [flash, teleport]
+  Kayn: [smite, flash]
+  TwistedFate: [teleport, flash]
+  Sivir: [barrier, flash]
+  Seraphine: [exhaust, flash]
+enemy_role_confidence: {}

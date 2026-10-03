@@ -1,0 +1,7 @@
+# Expected report shape (docs/RULES.md, Tests). Update on purpose.
+game: teemo_zed_poke
+role: jungle
+sections: [gank_first, lanes_in_trouble, enemy_jungler, start_objectives, counterpick, watch_out, dont_feed, game_plan]
+fired: [CHAMP-SNOWBALL, JG-ENEMY-FARMER, JG-HOVER-VOLATILE-BOT, JG-INVADE, JG-LANE-NEEDS-COVER, JG-RIVER-2V2-US,
+  JG-STRONGER-US, JG-YOU-COUNTERED, LANE-COINFLIP, MID-ASSASSIN, TOP-RANGED-INTO-US]
+not_fired: [LANE-LOSING, TOP-US-RANGED, JG-STRONGER-ENEMY, JG-ENEMY-GANKER]

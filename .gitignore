@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Secrets and local config (copy the .example files)
+.env
+config.yaml
+pool.yaml
+pools/
+
+# Machine-owned or personal data (docs/DATA.md, docs/DECISIONS.md #15)
+data/generated/
+data/cache/
+data/history/
+reports/
+
+# Local tool settings
+.claude/settings.local.json
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Real champ select recordings stay on the PC that made them; only the made-up samples are tracked
+tests/fixtures/champselect/*.json
+!tests/fixtures/champselect/sample_*.json

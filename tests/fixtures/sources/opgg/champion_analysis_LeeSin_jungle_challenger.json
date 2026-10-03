@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "class LolGetChampionAnalysis: champion,position,data\nclass Data: summary,counters_meta\nclass Summary: average_stats,positions\nclass AverageStats: play,win_rate,pick_rate,ban_rate,kda,tier,rank\nclass Position: name,stats\nclass Stats: play,win_rate,pick_rate,role_rate,ban_rate,kda\nclass CountersMeta: message\n\nLolGetChampionAnalysis(\"LEE_SIN\",\"JUNGLE\",Data(Summary(AverageStats(1176,0.5,0.21,0.25,3.25,1,2),[Position(\"JUNGLE\",Stats(1129,0.5,0.21,0.96,0.15,3.3))]),CountersMeta(\"Insufficient matchup sample. See data.summary.positions[].counters[] for raw matchup data (smaller sample).\")))"
+      }
+    ]
+  }
+}

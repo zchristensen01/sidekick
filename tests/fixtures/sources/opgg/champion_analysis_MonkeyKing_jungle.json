@@ -1,0 +1,12 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "class LolGetChampionAnalysis: champion,position,data\nclass Data: summary,weak_counters\nclass Summary: average_stats,positions\nclass AverageStats: play,win_rate,pick_rate,ban_rate,kda,tier,rank\nclass Position: name,stats\nclass Stats: play,win_rate,pick_rate,role_rate,ban_rate,kda\nclass WeakCounter: champion_id,champion_name,play,win,my_win_rate,counter_win_rate,win_rate\n\nLolGetChampionAnalysis(\"MONKEYKING\",\"JUNGLE\",Data(Summary(AverageStats(126117,0.52,0.08,0.05,2.78,2,4),[Position(\"JUNGLE\",Stats(107016,0.52,0.07,0.85,0.05,2.97)),Position(\"TOP\",Stats(16168,0.51,0.01,0.13,0.04,1.91))]),[WeakCounter(421,\"Rek'Sai\",579,269,0.46,0.54,0.54),WeakCounter(163,\"Taliyah\",332,154,0.46,0.54,0.54),WeakCounter(54,\"Malphite\",317,146,0.46,0.54,0.54)]))"
+      }
+    ]
+  }
+}
